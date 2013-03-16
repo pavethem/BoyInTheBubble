@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" width="200" height="12" tilewidth="32" tileheight="32">
+ <tileset firstgid="1" name="komet" tilewidth="32" tileheight="32">
+  <image source="komet.png" width="32" height="32"/>
+ </tileset>
+ <layer name="Kachelebene 1" width="200" height="12">
+  <data encoding="base64" compression="zlib">
+   eJztmVEOgCAMQ+H+lzb8GROmQMda3Ev8MXGUbUUCpXBTowUcQi2Zy4Sb6P5EeuQeqz6eRAtkzXbV/22cWR1oj1jv0LlS8J5nbtlhWh9XdbDMY4QdmhFjRNWm993XeAjdLH3F5g90blZrHQ26x5Xw2vvsgsnnPdT90RjVqjS3U1HwRsPSyPbvRIy1oomlnjM6WLQ3mLREknngwTrjUVwzVP4/Fur6EbDs/Xr+WD2fVa7x8+7EI7bn/oyFnIdvLBZQ94vq68afUa3b7p6b8YmnxgtB5QBp
+  </data>
+ </layer>
+</map>
