@@ -19,6 +19,11 @@ public class Boy {
 	public Animation death;
 	public boolean isdead;
 	public boolean isfinished;
+	public boolean isSplit;
+	public boolean isSplitting;
+	public float splitBoy1;
+	public float splitBoy2;
+	public final float SPLIT_DISTANCE = 1.2f;
 	
 	public Boy(float width, float height) {
 		
@@ -45,8 +50,12 @@ public class Boy {
 		
 		boyBounds = normalBoy.getBoundingRectangle();
 		
+		splitBoy1 = splitBoy2 = 0;
+		
 		isdead = false;
 		isfinished = false;
+		isSplit = false;
+		isSplitting = false;
 	}
 
 	public Vector3 getCorrectedPosition() {
@@ -76,6 +85,14 @@ public class Boy {
 
 	public void dispose() {
 		boySprites.clear();
+	}
+	
+	public boolean split() {
+		
+		isSplit = true;
+		
+		return isSplit;
+		
 	}
 	
 }

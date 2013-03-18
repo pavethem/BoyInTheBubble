@@ -116,7 +116,7 @@ public class GameScreen implements ApplicationListener {
 		
 		if(!boy.isdead)
 			boyRotation -= Gdx.graphics.getDeltaTime() * ROTATION_MULTIPLIER;
-		Vector3 position = boy.getCorrectedPosition();
+		
 		
 		if(!boy.isdead) {
 			camera.translate(Gdx.graphics.getDeltaTime() * 2, 0);
@@ -125,50 +125,91 @@ public class GameScreen implements ApplicationListener {
 		}
 		tiled.render();
 		
-		int fromX = (int) (boy.boyBounds.x + tiled.getViewBounds().x);
-		int fromY = (int) (boy.boyBounds.y);
-		int toX = (int) (boy.boyBounds.x + boy.boyBounds.width + tiled.getViewBounds().x);
-		int toY = (int) (boy.boyBounds.y + boy.boyBounds.height);
-		int middleX = (fromX + toX) /2;
-		int middleY = (fromY + toY) /2;
+		if(boy.isSplit) {
+			if(boy.splitBoy1 <= boy.SPLIT_DISTANCE)
+				boy.splitBoy1 += Gdx.graphics.getDeltaTime();
+			if(boy.splitBoy2 >= -boy.SPLIT_DISTANCE)
+				boy.splitBoy2 -= Gdx.graphics.getDeltaTime();
+		}
 		
-//		Gdx.app.log("", ""+ (int) newPos.x  + " " + (int) (newPos.y) );
-//		Gdx.app.log("", layer.getCell((int) newPos.x , (int)(newPos.y)) + "");
-//		Gdx.app.log("", "" + (int) boy.x + " " + (int)boy.y + " " + (int)boy.width + " " + (int)boy.height);
-//		Gdx.app.log("", "" + fromX + " " + fromY + " " + toX + " " + toY + " " + middleX + " " + middleY);
-		
-//		Gdx.app.log("", tiled.getViewBounds().toString());
-		
-		if(layer.getCell(fromX, fromY) != null)
-			boy.isdead = true;
-		else if(layer.getCell(toX, fromY) != null)
-			boy.isdead = true;
-		else if(layer.getCell(fromX, toY) != null)
-			boy.isdead = true;
-		else if(layer.getCell(toX, toY) != null)
-			boy.isdead = true;
-		else if(layer.getCell(middleX, toY) != null)
-			boy.isdead = true;
-		else if(layer.getCell(toX, middleY) != null)
-			boy.isdead = true;
-		else if(layer.getCell(middleX, middleY) != null)
-			boy.isdead = true;
+		collisionCheck();
 		
 		if(!boy.isdead) {
-			model.idt();
-			temp.idt();
-			temp.setToTranslation(-position.x,-position.y,0);
-			model.mul(temp);
-			temp.setToRotation(Vector3.Z, boyRotation);
-			model.mul(temp);
-			temp.setToTranslation(position);
-			model.mul(temp);
 			
-			batch.setProjectionMatrix(boyCam.combined);
-			batch.begin();
-			batch.setTransformMatrix(model);
-			boy.getCurrentFrame(0).draw(batch);
-			batch.end();
+			Vector3 position = boy.getCorrectedPosition();
+			
+			if(!boy.isSplit && !boy.isSplitting) {
+				model.idt();
+				temp.idt();
+				temp.setToTranslation(-position.x,-position.y,0);
+				model.mul(temp);
+				temp.setToRotation(Vector3.Z, boyRotation);
+				model.mul(temp);
+				temp.setToTranslation(position);
+				model.mul(temp);
+				
+				batch.setProjectionMatrix(boyCam.combined);
+				batch.begin();
+				batch.setTransformMatrix(model);
+				boy.getCurrentFrame(0).draw(batch);
+				batch.end();
+			}
+			else if(boy.isSplitting || boy.isSplit) {
+				
+				//render middle
+				model.idt();
+				temp.idt();
+				temp.setToTranslation(-position.x,-position.y,0);
+				model.mul(temp);
+				temp.setToRotation(Vector3.Z, boyRotation);
+				model.mul(temp);
+				temp.setToTranslation(position);
+				model.mul(temp);
+				
+				batch.setProjectionMatrix(boyCam.combined);
+				batch.begin();
+				batch.setTransformMatrix(model);
+				boy.getCurrentFrame(0).draw(batch);
+				batch.end();
+				
+				
+				//render splitboy1
+				model.idt();
+				temp.idt();
+				temp.setToTranslation(-position.x,-position.y,0);
+				model.mul(temp);
+				position.add(boy.splitBoy1,boy.splitBoy1,0);
+				
+				temp.setToRotation(Vector3.Z, boyRotation);
+				model.mul(temp);
+				temp.setToTranslation(position);
+				model.mul(temp);
+				
+				batch.setProjectionMatrix(boyCam.combined);
+				batch.begin();
+				batch.setTransformMatrix(model);
+				boy.getCurrentFrame(0).draw(batch);
+				batch.end();
+				
+				//render splitboy2
+				position = boy.getCorrectedPosition();
+				model.idt();
+				temp.idt();
+				temp.setToTranslation(-position.x,-position.y,0);
+				model.mul(temp);
+				position.add(boy.splitBoy2,boy.splitBoy2,0);
+				
+				temp.setToRotation(Vector3.Z, boyRotation);
+				model.mul(temp);
+				temp.setToTranslation(position);
+				model.mul(temp);
+				
+				batch.setProjectionMatrix(boyCam.combined);
+				batch.begin();
+				batch.setTransformMatrix(model);
+				boy.getCurrentFrame(0).draw(batch);
+				batch.end();
+			}
 		}
 		
 		if(boy.isdead && !finished) {
@@ -229,6 +270,74 @@ public class GameScreen implements ApplicationListener {
 			fadeBatch.end();
 		}
 
+		
+	}
+
+	private void collisionCheck() {
+		
+		if(!boy.isSplit) {
+			int fromX = (int) (boy.boyBounds.x + tiled.getViewBounds().x);
+			int fromY = (int) (boy.boyBounds.y);
+			int toX = (int) (boy.boyBounds.x + boy.boyBounds.width + tiled.getViewBounds().x);
+			int toY = (int) (boy.boyBounds.y + boy.boyBounds.height);
+			int middleX = (fromX + toX) /2;
+			int middleY = (fromY + toY) /2;
+			
+	//		Gdx.app.log("", ""+ (int) newPos.x  + " " + (int) (newPos.y) );
+	//		Gdx.app.log("", layer.getCell((int) newPos.x , (int)(newPos.y)) + "");
+	//		Gdx.app.log("", "" + (int) boy.x + " " + (int)boy.y + " " + (int)boy.width + " " + (int)boy.height);
+	//		Gdx.app.log("", "" + fromX + " " + fromY + " " + toX + " " + toY + " " + middleX + " " + middleY);
+			
+	//		Gdx.app.log("", tiled.getViewBounds().toString());
+			
+			if(layer.getCell(fromX, fromY) != null)
+				boy.isdead = true;
+			else if(layer.getCell(toX, fromY) != null)
+				boy.isdead = true;
+			else if(layer.getCell(fromX, toY) != null)
+				boy.isdead = true;
+			else if(layer.getCell(toX, toY) != null)
+				boy.isdead = true;
+			else if(layer.getCell(middleX, toY) != null)
+				boy.isdead = true;
+			else if(layer.getCell(toX, middleY) != null)
+				boy.isdead = true;
+			else if(layer.getCell(middleX, middleY) != null)
+				boy.isdead = true;
+		}
+		else {
+			int fromX = (int) (boy.boyBounds.x + tiled.getViewBounds().x + boy.splitBoy1);
+			int fromY = (int) (boy.boyBounds.y + boy.splitBoy1);
+			int toX = (int) (boy.boyBounds.x + boy.boyBounds.width + tiled.getViewBounds().x + boy.splitBoy1);
+			int toY = (int) (boy.boyBounds.y + boy.boyBounds.height + boy.splitBoy1);
+			int middleX = (fromX + toX) /2;
+			int middleY = (fromY + toY) /2;
+			
+	//		Gdx.app.log("", ""+ (int) newPos.x  + " " + (int) (newPos.y) );
+	//		Gdx.app.log("", layer.getCell((int) newPos.x , (int)(newPos.y)) + "");
+	//		Gdx.app.log("", "" + (int) boy.x + " " + (int)boy.y + " " + (int)boy.width + " " + (int)boy.height);
+	//		Gdx.app.log("", "" + fromX + " " + fromY + " " + toX + " " + toY + " " + middleX + " " + middleY);
+			
+	//		Gdx.app.log("", tiled.getViewBounds().toString());
+			
+			if(layer.getCell(fromX, fromY) != null)
+				boy.isdead = true;
+			else if(layer.getCell(toX, fromY) != null)
+				boy.isdead = true;
+			else if(layer.getCell(fromX, toY) != null)
+				boy.isdead = true;
+			else if(layer.getCell(toX, toY) != null)
+				boy.isdead = true;
+			else if(layer.getCell(middleX, toY) != null)
+				boy.isdead = true;
+			else if(layer.getCell(toX, middleY) != null)
+				boy.isdead = true;
+			else if(layer.getCell(middleX, middleY) != null)
+				boy.isdead = true;
+		}
+		
+		if(boy.isSplit && boy.splitBoy1 <= boy.SPLIT_DISTANCE)
+			boy.isdead = false;
 		
 	}
 

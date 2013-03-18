@@ -2,6 +2,7 @@ package de.redlion.BoyInTheBubble;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
+import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.math.MathUtils;
@@ -151,6 +152,14 @@ public class OrthoCamController extends InputAdapter {
 			GameScreen.boy.normalBoy.setPosition(newPos.x -offsetX , newPos.y -offsetY);
 		}
 		
+		return true;
+	}
+	
+	@Override
+	public boolean keyUp (int keycode) {
+		
+		if(keycode == Keys.S)
+			GameScreen.boy.split();
 		return true;
 	}
 	
