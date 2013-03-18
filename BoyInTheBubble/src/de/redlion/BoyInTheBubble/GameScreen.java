@@ -37,20 +37,15 @@ public class GameScreen implements ApplicationListener {
 	private OrthographicCamera boyCam;
 	private OrthogonalTiledMapRenderer tiled;
 	private SpriteBatch batch;
-	private TextureAtlas boyTex;
-	private Array<Sprite> boy;
-	public static Sprite normalBoy;
-	private Sprite deadBoy;
-	private Rectangle boyBounds;
+	
 	private TiledMapTileLayer layer;
-	private Animation death;
+
 	private float stateTime;
-	private TextureRegion currentFrame;
+	
+	public static Boy boy;
 	
 	Sprite blackFade;
 	SpriteBatch fadeBatch;
-	
-	public static boolean dead;
 	
 	float startTime = 0;
 	float fade = 1.0f;
@@ -65,11 +60,9 @@ public class GameScreen implements ApplicationListener {
 	
 	float boyRotation = 0;
 	final float ROTATION_MULTIPLIER = 20;
-	ShapeRenderer r;
 	
 	@Override
 	public void create() {		
-		r = new ShapeRenderer();
 		Configuration.getInstance().setConfiguration();
 		
 		float w = Gdx.graphics.getWidth();
@@ -90,41 +83,16 @@ public class GameScreen implements ApplicationListener {
 		camController = new OrthoCamController(boyCam);
 		Gdx.input.setInputProcessor(camController);
 		
-		boyTex = Resources.getInstance().boyTextures;
-		boy = boyTex.createSprites();
-		
-//		for(Sprite s : boy) {
-//		
-//			s.getTexture().setFilter(TextureFilter.Linear, TextureFilter.Linear);
-//			s.setSize(1.5f, 1.5f);
-//			s.setOrigin(s.getWidth()/2, s.getHeight()/2);
-//			s.setPosition(camera.viewportWidth / 2, camera.viewportHeight / 2);
-//		}
+		boy = new Boy(camera.viewportWidth, camera.viewportHeight);
 		
 		blackFade = new Sprite(
 				new Texture(Gdx.files.internal("data/black.png")));
 		fadeBatch = new SpriteBatch();
 		fadeBatch.getProjectionMatrix().setToOrtho2D(0, 0, 1, 1);
 		
-		death = new Animation(0.06f, boyTex.getRegions());
-		death.setPlayMode(Animation.NORMAL);
-		
-		normalBoy = boy.get(0);
-		
-		normalBoy.getTexture().setFilter(TextureFilter.Linear, TextureFilter.Linear);
-		normalBoy.setSize(1.5f, 1.5f);
-		normalBoy.setOrigin(normalBoy.getWidth()/2, normalBoy.getHeight()/2);
-		normalBoy.setPosition(camera.viewportWidth / 4, camera.viewportHeight / 2);
-		
-		deadBoy = normalBoy;
-		
-		boyBounds = normalBoy.getBoundingRectangle();
-		
 		layer = (TiledMapTileLayer) Resources.getInstance().map.getLayers().getLayer(0);
 		
 		tiled.getMap().getTileSets().getTileSet(0).getTile(1).getTextureRegion().getTexture().setFilter(TextureFilter.Linear, TextureFilter.Linear);
-		
-		dead = false;
 		
 		stateTime = 0;
 		finished = false;
@@ -134,7 +102,9 @@ public class GameScreen implements ApplicationListener {
 	@Override
 	public void dispose() {
 		batch.dispose();
-		boyTex.dispose();
+		boy.dispose();
+		tiled.dispose();
+		fadeBatch.dispose();
 	}
 
 	@Override
@@ -144,21 +114,21 @@ public class GameScreen implements ApplicationListener {
 		
 		delta = Math.min(0.1f, Gdx.graphics.getDeltaTime());
 		
-		if(!dead)
+		if(!boy.isdead)
 			boyRotation -= Gdx.graphics.getDeltaTime() * ROTATION_MULTIPLIER;
-		Vector3 position = new Vector3(-normalBoy.getX() - normalBoy.getOriginX(),-normalBoy.getY() - normalBoy.getOriginY(),0);
+		Vector3 position = boy.getCorrectedPosition();
 		
-		if(!dead) {
+		if(!boy.isdead) {
 			camera.translate(Gdx.graphics.getDeltaTime() * 2, 0);
 			camera.update();
 			tiled.setView(camera);
 		}
 		tiled.render();
 		
-		int fromX = (int) (boyBounds.x + tiled.getViewBounds().x);
-		int fromY = (int) (boyBounds.y);
-		int toX = (int) (boyBounds.x + boyBounds.width + tiled.getViewBounds().x);
-		int toY = (int) (boyBounds.y + boyBounds.height);
+		int fromX = (int) (boy.boyBounds.x + tiled.getViewBounds().x);
+		int fromY = (int) (boy.boyBounds.y);
+		int toX = (int) (boy.boyBounds.x + boy.boyBounds.width + tiled.getViewBounds().x);
+		int toY = (int) (boy.boyBounds.y + boy.boyBounds.height);
 		int middleX = (fromX + toX) /2;
 		int middleY = (fromY + toY) /2;
 		
@@ -170,21 +140,21 @@ public class GameScreen implements ApplicationListener {
 //		Gdx.app.log("", tiled.getViewBounds().toString());
 		
 		if(layer.getCell(fromX, fromY) != null)
-			dead = true;
+			boy.isdead = true;
 		else if(layer.getCell(toX, fromY) != null)
-			dead = true;
+			boy.isdead = true;
 		else if(layer.getCell(fromX, toY) != null)
-			dead = true;
+			boy.isdead = true;
 		else if(layer.getCell(toX, toY) != null)
-			dead = true;
+			boy.isdead = true;
 		else if(layer.getCell(middleX, toY) != null)
-			dead = true;
+			boy.isdead = true;
 		else if(layer.getCell(toX, middleY) != null)
-			dead = true;
+			boy.isdead = true;
 		else if(layer.getCell(middleX, middleY) != null)
-			dead = true;
+			boy.isdead = true;
 		
-		if(!dead) {
+		if(!boy.isdead) {
 			model.idt();
 			temp.idt();
 			temp.setToTranslation(-position.x,-position.y,0);
@@ -197,24 +167,24 @@ public class GameScreen implements ApplicationListener {
 			batch.setProjectionMatrix(boyCam.combined);
 			batch.begin();
 			batch.setTransformMatrix(model);
-			normalBoy.draw(batch);
+			boy.getCurrentFrame(0).draw(batch);
 			batch.end();
 		}
 		
-		if(dead && !finished) {
+		if(boy.isdead && !finished) {
 			
-			Vector3 pos = new Vector3(normalBoy.getX(),normalBoy.getY(),0);
+			Vector3 pos = boy.getPosition();
 			camera.project(pos);
 			
 			stateTime += Gdx.graphics.getDeltaTime();
-			currentFrame = death.getKeyFrame(stateTime, false);
-			currentFrame.getTexture().setFilter(TextureFilter.Linear, TextureFilter.Linear);
+//			currentFrame = boy.getCurrentFrame(stateTime);
+			boy.getCurrentFrame(stateTime).getTexture().setFilter(TextureFilter.Linear, TextureFilter.Linear);
 			
-			deadBoy = boy.get(death.getKeyFrameIndex(stateTime));
+			Sprite deadBoy = new Sprite(boy.getCurrentFrame(stateTime));
 			
 			deadBoy.setSize(1.5f, 1.5f);
-			deadBoy.setPosition(normalBoy.getX(), normalBoy.getY());
-			deadBoy.setOrigin(normalBoy.getOriginX(), normalBoy.getOriginY());
+			deadBoy.setPosition(boy.getPosition().x,boy.getPosition().y);
+			deadBoy.setOrigin(boy.getOrigin().x, boy.getOrigin().y);
 			deadBoy.setRotation(boyRotation);
 			model.idt();
 			
@@ -223,15 +193,15 @@ public class GameScreen implements ApplicationListener {
 			deadBoy.draw(batch);
 			batch.end();
 			
-			if(death.isAnimationFinished(stateTime)) {
-				float y = normalBoy.getY();
+			if(boy.isfinished) {
+				float y = boy.getPosition().y;
 				y -= 0.25f;
 				
 				deadBoy.setRotation(boyRotation);
 				model.idt();
-				normalBoy.setPosition(normalBoy.getX(), y);
+				boy.normalBoy.setPosition(boy.getPosition().x, y);
 				
-				if(normalBoy.getY() < 0) 
+				if(boy.getPosition().y < 0) 
 					finished = true;
 			}
 			
@@ -245,6 +215,7 @@ public class GameScreen implements ApplicationListener {
 			blackFade.draw(fadeBatch);
 			fadeBatch.end();
 			if (fade >= 1) {
+				dispose();
 				create();
 			}
 		}
@@ -263,8 +234,8 @@ public class GameScreen implements ApplicationListener {
 
 	@Override
 	public void resize(int width, int height) {
-		normalBoy.setOrigin(normalBoy.getWidth()/2, normalBoy.getHeight()/2);
-		normalBoy.setPosition(camera.viewportWidth / 4, camera.viewportHeight / 2);
+		boy.normalBoy.setOrigin(boy.normalBoy.getWidth()/2, boy.normalBoy.getHeight()/2);
+		boy.normalBoy.setPosition(camera.viewportWidth / 4, camera.viewportHeight / 2);
 	}
 
 	@Override

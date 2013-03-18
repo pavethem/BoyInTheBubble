@@ -32,13 +32,12 @@ public class OrthoCamController extends InputAdapter {
 		this.camera = camera;
 		SCREEN_BIAS_X = (int) (Gdx.graphics.getWidth() / 40);
 		SCREEN_BIAS_Y = (int) (Gdx.graphics.getHeight() / 20);
-		System.out.println(SCREEN_BIAS_Y + "");
 	}
 	
 	@Override
 	public boolean touchDragged (int x, int y, int pointer) {
 		
-		if(GameScreen.dead)
+		if(GameScreen.boy.isdead)
 			return true;
 		
 		x = MathUtils.clamp(x, 0, Gdx.graphics.getWidth());
@@ -72,20 +71,19 @@ public class OrthoCamController extends InputAdapter {
 					y = (int) last.y;
 				else if(y + screenOffsetY - Resources.getInstance().boyTextures.getRegions().get(0).originalHeight / 2 < 0) {
 					y = (int) last.y;
-					System.out.println("das");
 				}
 			}
 			
 			Vector3 newPos = new Vector3(x, y,0);		
 			camera.unproject(newPos);
 			
-			normalBoy = GameScreen.normalBoy.getBoundingRectangle();
+			normalBoy = GameScreen.boy.normalBoy.getBoundingRectangle();
 				
-			newPos.x -= GameScreen.normalBoy.getOriginX();
-			newPos.y += GameScreen.normalBoy.getOriginY();
+			newPos.x -= GameScreen.boy.getOrigin().x;
+			newPos.y += GameScreen.boy.getOrigin().y;
 			
 			
-			GameScreen.normalBoy.setPosition(newPos.x  - offsetX, newPos.y  - offsetY);
+			GameScreen.boy.normalBoy.setPosition(newPos.x  - offsetX, newPos.y  - offsetY);
 			last.set(x,y);
 			
 		}
@@ -107,7 +105,7 @@ public class OrthoCamController extends InputAdapter {
 
 		y = -y + Gdx.graphics.getHeight();
 		
-		normalBoy = GameScreen.normalBoy.getBoundingRectangle();
+		normalBoy = GameScreen.boy.normalBoy.getBoundingRectangle();
 		
 		Vector3 pos = new Vector3(normalBoy.x,normalBoy.y,0);
 		
@@ -120,7 +118,7 @@ public class OrthoCamController extends InputAdapter {
 		
 		Rectangle box = new Rectangle(pos.x, pos.y, w,h);
 		
-		if(box.contains(x,y) && !GameScreen.dead) {
+		if(box.contains(x,y) && !GameScreen.boy.isdead) {
 			touched = true;
 			
 			float centerX = normalBoy.getX() + normalBoy.getWidth() / 2;
@@ -147,10 +145,10 @@ public class OrthoCamController extends InputAdapter {
 			
 			
 			
-			newPos.x -= GameScreen.normalBoy.getOriginX();
-			newPos.y += GameScreen.normalBoy.getOriginY();
+			newPos.x -= GameScreen.boy.getOrigin().x;
+			newPos.y += GameScreen.boy.getOrigin().y;
 			
-			GameScreen.normalBoy.setPosition(newPos.x -offsetX , newPos.y -offsetY);
+			GameScreen.boy.normalBoy.setPosition(newPos.x -offsetX , newPos.y -offsetY);
 		}
 		
 		return true;
