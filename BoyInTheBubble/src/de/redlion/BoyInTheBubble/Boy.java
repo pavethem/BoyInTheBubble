@@ -20,7 +20,6 @@ public class Boy {
 	public boolean isdead;
 	public boolean isfinished;
 	public boolean isSplit;
-	public boolean isSplitting;
 	public float splitBoy1;
 	public float splitBoy2;
 	public final float SPLIT_DISTANCE = 1.2f;
@@ -55,7 +54,6 @@ public class Boy {
 		isdead = false;
 		isfinished = false;
 		isSplit = false;
-		isSplitting = false;
 	}
 
 	public Vector3 getCorrectedPosition() {

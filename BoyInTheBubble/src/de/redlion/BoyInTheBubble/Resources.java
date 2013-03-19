@@ -14,6 +14,7 @@ public class Resources {
 	public static Resources instance;
 	
 	public TextureAtlas boyTextures;
+	public Texture middle;
 //	public Texture boyTex;
 	public TiledMap map;
 
@@ -31,6 +32,7 @@ public class Resources {
 
 	public void reInit() {			
 		boyTextures = new TextureAtlas(Gdx.files.internal("data/boy.pack"));
+		middle = new Texture(Gdx.files.internal("data/middle.png"));
 //		boyTex = boyTextures.getRegions().get(0).getTexture();
 		map = new TmxMapLoader().load("./data/map.tmx");
 	}

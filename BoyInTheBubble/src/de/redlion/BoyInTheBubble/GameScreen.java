@@ -44,6 +44,8 @@ public class GameScreen implements ApplicationListener {
 	
 	public static Boy boy;
 	
+	Sprite middle;
+	
 	Sprite blackFade;
 	SpriteBatch fadeBatch;
 	
@@ -61,9 +63,13 @@ public class GameScreen implements ApplicationListener {
 	float boyRotation = 0;
 	final float ROTATION_MULTIPLIER = 20;
 	
+	ShapeRenderer r;
+	
 	@Override
 	public void create() {		
 		Configuration.getInstance().setConfiguration();
+		
+		r = new ShapeRenderer();
 		
 		float w = Gdx.graphics.getWidth();
 		float h = Gdx.graphics.getHeight();
@@ -84,6 +90,12 @@ public class GameScreen implements ApplicationListener {
 		Gdx.input.setInputProcessor(camController);
 		
 		boy = new Boy(camera.viewportWidth, camera.viewportHeight);
+		
+		middle = new Sprite(Resources.getInstance().middle);
+		middle.getTexture().setFilter(TextureFilter.Linear, TextureFilter.Linear);
+		middle.setSize(1, 1);
+		middle.setOrigin(middle.getWidth()/2, middle.getHeight()/2);
+//		middle.setPosition(w / 4, h / 2);
 		
 		blackFade = new Sprite(
 				new Texture(Gdx.files.internal("data/black.png")));
@@ -138,7 +150,7 @@ public class GameScreen implements ApplicationListener {
 			
 			Vector3 position = boy.getCorrectedPosition();
 			
-			if(!boy.isSplit && !boy.isSplitting) {
+			if(!boy.isSplit) {
 				model.idt();
 				temp.idt();
 				temp.setToTranslation(-position.x,-position.y,0);
@@ -154,9 +166,10 @@ public class GameScreen implements ApplicationListener {
 				boy.getCurrentFrame(0).draw(batch);
 				batch.end();
 			}
-			else if(boy.isSplitting || boy.isSplit) {
+			else if(boy.isSplit) {
 				
 				//render middle
+				
 				model.idt();
 				temp.idt();
 				temp.setToTranslation(-position.x,-position.y,0);
@@ -166,10 +179,12 @@ public class GameScreen implements ApplicationListener {
 				temp.setToTranslation(position);
 				model.mul(temp);
 				
+				middle.setPosition(boy.getPosition().x + middle.getOriginX() / 2, boy.getPosition().y + middle.getOriginY() / 2);
+				
 				batch.setProjectionMatrix(boyCam.combined);
 				batch.begin();
 				batch.setTransformMatrix(model);
-				boy.getCurrentFrame(0).draw(batch);
+				middle.draw(batch);
 				batch.end();
 				
 				
@@ -269,7 +284,6 @@ public class GameScreen implements ApplicationListener {
 			blackFade.draw(fadeBatch);
 			fadeBatch.end();
 		}
-
 		
 	}
 
@@ -306,37 +320,103 @@ public class GameScreen implements ApplicationListener {
 				boy.isdead = true;
 		}
 		else {
-			int fromX = (int) (boy.boyBounds.x + tiled.getViewBounds().x + boy.splitBoy1);
-			int fromY = (int) (boy.boyBounds.y + boy.splitBoy1);
-			int toX = (int) (boy.boyBounds.x + boy.boyBounds.width + tiled.getViewBounds().x + boy.splitBoy1);
-			int toY = (int) (boy.boyBounds.y + boy.boyBounds.height + boy.splitBoy1);
-			int middleX = (fromX + toX) /2;
-			int middleY = (fromY + toY) /2;
 			
-	//		Gdx.app.log("", ""+ (int) newPos.x  + " " + (int) (newPos.y) );
-	//		Gdx.app.log("", layer.getCell((int) newPos.x , (int)(newPos.y)) + "");
-	//		Gdx.app.log("", "" + (int) boy.x + " " + (int)boy.y + " " + (int)boy.width + " " + (int)boy.height);
-	//		Gdx.app.log("", "" + fromX + " " + fromY + " " + toX + " " + toY + " " + middleX + " " + middleY);
-			
-	//		Gdx.app.log("", tiled.getViewBounds().toString());
-			
-			if(layer.getCell(fromX, fromY) != null)
-				boy.isdead = true;
-			else if(layer.getCell(toX, fromY) != null)
-				boy.isdead = true;
-			else if(layer.getCell(fromX, toY) != null)
-				boy.isdead = true;
-			else if(layer.getCell(toX, toY) != null)
-				boy.isdead = true;
-			else if(layer.getCell(middleX, toY) != null)
-				boy.isdead = true;
-			else if(layer.getCell(toX, middleY) != null)
-				boy.isdead = true;
-			else if(layer.getCell(middleX, middleY) != null)
-				boy.isdead = true;
+			{
+				//check splitboy1
+				int fromX = (int) (boy.boyBounds.x + tiled.getViewBounds().x);
+				int fromY = (int) (boy.boyBounds.y);
+				int toX = (int) (boy.boyBounds.x + boy.boyBounds.width + tiled.getViewBounds().x);
+				int toY = (int) (boy.boyBounds.y + boy.boyBounds.height);
+				
+				Vector3 from = new Vector3(boy.splitBoy1, boy.splitBoy1,0);
+				Vector3 to = new Vector3(boy.splitBoy1, boy.splitBoy1,0);
+				
+				from.rotate(Vector3.Z, boyRotation);
+				to.rotate(Vector3.Z, boyRotation);
+				
+				from.add(fromX, fromY, 0);
+				to.add(toX , toY , 0);
+				
+				fromX = (int) from.x;
+				fromY = (int) from.y;
+				toX = (int) to.x;
+				toY = (int) to.y;
+				
+				int middleX = (fromX + toX) /2;
+				int middleY = (fromY + toY) /2;
+				
+		//		Gdx.app.log("", ""+ (int) newPos.x  + " " + (int) (newPos.y) );
+		//		Gdx.app.log("", layer.getCell((int) newPos.x , (int)(newPos.y)) + "");
+		//		Gdx.app.log("", "" + (int) boy.x + " " + (int)boy.y + " " + (int)boy.width + " " + (int)boy.height);
+		//		Gdx.app.log("", "" + fromX + " " + fromY + " " + toX + " " + toY + " " + middleX + " " + middleY);
+				
+		//		Gdx.app.log("", tiled.getViewBounds().toString());
+				
+				if(layer.getCell(fromX, fromY) != null)
+					boy.isdead = true;
+				else if(layer.getCell(toX, fromY) != null)
+					boy.isdead = true;
+				else if(layer.getCell(fromX, toY) != null)
+					boy.isdead = true;
+				else if(layer.getCell(toX, toY) != null)
+					boy.isdead = true;
+				else if(layer.getCell(middleX, toY) != null)
+					boy.isdead = true;
+				else if(layer.getCell(toX, middleY) != null)
+					boy.isdead = true;
+				else if(layer.getCell(middleX, middleY) != null)
+					boy.isdead = true;
+			}
+			{
+				//check splitboy2
+				int fromX = (int) (boy.boyBounds.x + tiled.getViewBounds().x);
+				int fromY = (int) (boy.boyBounds.y);
+				int toX = (int) (boy.boyBounds.x + boy.boyBounds.width + tiled.getViewBounds().x);
+				int toY = (int) (boy.boyBounds.y + boy.boyBounds.height);
+				
+				Vector3 from = new Vector3(boy.splitBoy2, boy.splitBoy2,0);
+				Vector3 to = new Vector3(boy.splitBoy2, boy.splitBoy2,0);
+				
+				from.rotate(Vector3.Z, boyRotation);
+				to.rotate(Vector3.Z, boyRotation);
+				
+				from.add(fromX, fromY, 0);
+				to.add(toX , toY , 0);
+				
+				fromX = (int) from.x;
+				fromY = (int) from.y;
+				toX = (int) to.x;
+				toY = (int) to.y;
+				
+				int middleX = (fromX + toX) /2;
+				int middleY = (fromY + toY) /2;
+				
+		//		Gdx.app.log("", ""+ (int) newPos.x  + " " + (int) (newPos.y) );
+		//		Gdx.app.log("", layer.getCell((int) newPos.x , (int)(newPos.y)) + "");
+		//		Gdx.app.log("", "" + (int) boy.x + " " + (int)boy.y + " " + (int)boy.width + " " + (int)boy.height);
+		//		Gdx.app.log("", "" + fromX + " " + fromY + " " + toX + " " + toY + " " + middleX + " " + middleY);
+				
+		//		Gdx.app.log("", tiled.getViewBounds().toString());
+				
+				if(layer.getCell(fromX, fromY) != null)
+					boy.isdead = true;
+				else if(layer.getCell(toX, fromY) != null)
+					boy.isdead = true;
+				else if(layer.getCell(fromX, toY) != null)
+					boy.isdead = true;
+				else if(layer.getCell(toX, toY) != null)
+					boy.isdead = true;
+				else if(layer.getCell(middleX, toY) != null)
+					boy.isdead = true;
+				else if(layer.getCell(toX, middleY) != null)
+					boy.isdead = true;
+				else if(layer.getCell(middleX, middleY) != null)
+					boy.isdead = true;
+			}
+
 		}
 		
-		if(boy.isSplit && boy.splitBoy1 <= boy.SPLIT_DISTANCE)
+//		if(boy.isSplit && boy.splitBoy1 <= boy.SPLIT_DISTANCE)
 			boy.isdead = false;
 		
 	}
