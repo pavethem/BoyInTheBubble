@@ -48,7 +48,7 @@ public class OrthoCamController extends InputAdapter {
 			
 			//TODO: bias definieren, da er oben und rechts manchmal noch rausrutscht...
 			
-			if(!GameScreen.boy.isSplit) {
+//			if(!GameScreen.boy.isSplit) {
 				if(screenOffsetX > 0) {
 					if(x + ((Resources.getInstance().boyTextures.getRegions().get(0).originalWidth / 2) - screenOffsetX) < Resources.getInstance().boyTextures.getRegions().get(0).originalWidth)
 						x = (int) last.x;
@@ -69,49 +69,55 @@ public class OrthoCamController extends InputAdapter {
 						y = (int) last.y;
 				}
 				else {
-					if(y + ((Resources.getInstance().boyTextures.getRegions().get(0).originalHeight) + screenOffsetY) >= Gdx.graphics.getHeight() + + SCREEN_BIAS_Y)
+					if(y + ((Resources.getInstance().boyTextures.getRegions().get(0).originalHeight) + screenOffsetY) >= Gdx.graphics.getHeight() + SCREEN_BIAS_Y)
 						y = (int) last.y;
 					else if(y + screenOffsetY - Resources.getInstance().boyTextures.getRegions().get(0).originalHeight / 2 < 0) {
 						y = (int) last.y;
 					}
 				}
-			}
-			else {
-				System.out.println("das");
-				
-				Vector3 proj = new Vector3(x, y, 0);
-				camera.unproject(proj);
-				
-				int x1 = (int) (proj.x + GameScreen.boy.splitBoy1);
-				int y1 = (int) (proj.y + GameScreen.boy.splitBoy1);
-				
-				if(screenOffsetX > 0) {
-					if(x1 + ((GameScreen.boy.boyBounds.getWidth() / 2) - offsetX) < GameScreen.boy.boyBounds.getWidth())
-						x = (int) last.x;
-					else if(x1 + ((GameScreen.boy.boyBounds.getWidth()) - offsetX) >= camera.viewportWidth /* */)
-						x = (int) last.x;
-				}
-				else {
-					if(x1 - ((GameScreen.boy.boyBounds.getWidth() / 2) + offsetX) < 0)
-						x = (int) last.x;
-					else if(x1 - offsetX + (GameScreen.boy.boyBounds.getWidth() / 2) >= camera.viewportWidth)
-						x = (int) last.x;
-				}
-				
-				if(screenOffsetY > 0) {
-					if(y1 + ((Resources.getInstance().boyTextures.getRegions().get(0).originalHeight) + screenOffsetY) >= Gdx.graphics.getHeight() + SCREEN_BIAS_Y)
-						y = (int) last.y;
-					else if(y1 + ((Resources.getInstance().boyTextures.getRegions().get(0).originalHeight) + screenOffsetY) < Resources.getInstance().boyTextures.getRegions().get(0).originalHeight + SCREEN_BIAS_Y)
-						y = (int) last.y;
-				}
-				else {
-					if(y1 + ((Resources.getInstance().boyTextures.getRegions().get(0).originalHeight) + screenOffsetY) >= Gdx.graphics.getHeight() + + SCREEN_BIAS_Y)
-						y = (int) last.y;
-					else if(y1 + screenOffsetY - Resources.getInstance().boyTextures.getRegions().get(0).originalHeight / 2 < 0) {
-						y = (int) last.y;
-					}
-				}
-			}
+//			}
+//			else {
+//				TODO: splitboy stuff wieder reinnehmen? sodass keiner der splitboys rausrutschen kann? dann müsste man aber touch wieder neu machen....	
+//				
+//				Vector3 proj = new Vector3(GameScreen.boy.splitBoy1, GameScreen.boy.splitBoy1, 0);
+//				proj.rotate(Vector3.Z, GameScreen.boyRotation);
+//				int fromX = (int) (GameScreen.boy.boyBounds.x);
+//				int fromY = (int) (GameScreen.boy.boyBounds.y);
+//				proj.add(fromX, fromY, 0);
+//				camera.project(proj);
+//				
+//				int x1 = (int) proj.x;
+//				int y1 = (int) proj.y;
+//				
+//				System.out.println(proj.toString());
+//				
+//				if(screenOffsetX > 0) {
+//					if(x1 + ((Resources.getInstance().boyTextures.getRegions().get(0).originalWidth / 2) - screenOffsetX) < Resources.getInstance().boyTextures.getRegions().get(0).originalWidth)
+//						x+=20;
+//					else if(x1 + ((Resources.getInstance().boyTextures.getRegions().get(0).originalWidth) - screenOffsetX) >= Gdx.graphics.getWidth() + SCREEN_BIAS_X)
+//						x+=20;
+//				}
+//				else {
+//					if(x1 - ((Resources.getInstance().boyTextures.getRegions().get(0).originalWidth / 2) + screenOffsetX) < 0)
+//						x+=20;
+//					else if(x1 - screenOffsetX + (Resources.getInstance().boyTextures.getRegions().get(0).originalWidth / 2) >= Gdx.graphics.getWidth())
+//						x+=20;
+//				}
+//				
+//				if(screenOffsetY > 0) {
+//					if(y1 + ((Resources.getInstance().boyTextures.getRegions().get(0).originalHeight) + screenOffsetY) >= Gdx.graphics.getHeight() + SCREEN_BIAS_Y)
+//						y = (int) last.y;
+//					else if(y1 + ((Resources.getInstance().boyTextures.getRegions().get(0).originalHeight) + screenOffsetY) < Resources.getInstance().boyTextures.getRegions().get(0).originalHeight + SCREEN_BIAS_Y)
+//						y = (int) last.y;
+//				}
+//				else {
+//					if(y1 + ((Resources.getInstance().boyTextures.getRegions().get(0).originalHeight) + screenOffsetY) >= Gdx.graphics.getHeight() + SCREEN_BIAS_Y)
+//						y = (int) last.y;
+//					else if(y1 + screenOffsetY - Resources.getInstance().boyTextures.getRegions().get(0).originalHeight / 2 < 0) {
+//						y = (int) last.y;
+//					}
+//				}
+//			}
 			
 			Vector3 newPos = new Vector3(x, y,0);		
 			camera.unproject(newPos);

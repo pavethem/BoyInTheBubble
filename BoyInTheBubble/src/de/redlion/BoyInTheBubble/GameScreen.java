@@ -35,7 +35,7 @@ import com.badlogic.gdx.utils.Array;
 public class GameScreen implements ApplicationListener {
 	private OrthographicCamera camera;
 	private OrthographicCamera boyCam;
-	private OrthogonalTiledMapRenderer tiled;
+	static OrthogonalTiledMapRenderer tiled;
 	private SpriteBatch batch;
 	
 	private TiledMapTileLayer layer;
@@ -43,6 +43,8 @@ public class GameScreen implements ApplicationListener {
 	private float stateTime;
 	
 	public static Boy boy;
+	public Boy splitBoy1;
+	public Boy splitBoy2;
 	
 	Sprite middle;
 	
@@ -60,7 +62,7 @@ public class GameScreen implements ApplicationListener {
 	
 	OrthoCamController camController;
 	
-	float boyRotation = 0;
+	static float boyRotation = 0;
 	final float ROTATION_MULTIPLIER = 20;
 	
 	ShapeRenderer r;
@@ -90,12 +92,14 @@ public class GameScreen implements ApplicationListener {
 		Gdx.input.setInputProcessor(camController);
 		
 		boy = new Boy(camera.viewportWidth, camera.viewportHeight);
+		splitBoy1 = new Boy(camera.viewportWidth, camera.viewportHeight);
+		splitBoy2 = new Boy(camera.viewportWidth, camera.viewportHeight);
 		
 		middle = new Sprite(Resources.getInstance().middle);
 		middle.getTexture().setFilter(TextureFilter.Linear, TextureFilter.Linear);
-		middle.setSize(1, 1);
+		middle.setSize(0.5f, 0.5f);
 		middle.setOrigin(middle.getWidth()/2, middle.getHeight()/2);
-//		middle.setPosition(w / 4, h / 2);
+		middle.setPosition(w/4,h/2);		
 		
 		blackFade = new Sprite(
 				new Texture(Gdx.files.internal("data/black.png")));
@@ -109,6 +113,8 @@ public class GameScreen implements ApplicationListener {
 		stateTime = 0;
 		finished = false;
 		fade = 1.0f;
+		
+		boyRotation = 0;
 	}
 
 	@Override
@@ -138,10 +144,14 @@ public class GameScreen implements ApplicationListener {
 		tiled.render();
 		
 		if(boy.isSplit) {
-			if(boy.splitBoy1 <= boy.SPLIT_DISTANCE)
-				boy.splitBoy1 += Gdx.graphics.getDeltaTime();
-			if(boy.splitBoy2 >= -boy.SPLIT_DISTANCE)
-				boy.splitBoy2 -= Gdx.graphics.getDeltaTime();
+			if(splitBoy1.split_dist <= splitBoy1.SPLIT_DISTANCE) {
+				splitBoy1.normalBoy.setPosition(splitBoy1.normalBoy.getX(),splitBoy1.normalBoy.getY() + Gdx.graphics.getDeltaTime());
+				splitBoy1.split_dist += Gdx.graphics.getDeltaTime();
+			}
+			if(splitBoy2.split_dist >= -splitBoy2.SPLIT_DISTANCE) {
+				splitBoy2.normalBoy.setPosition(splitBoy2.normalBoy.getX(),splitBoy2.normalBoy.getY() - Gdx.graphics.getDeltaTime());
+				splitBoy2.split_dist -= Gdx.graphics.getDeltaTime();
+			}
 		}
 		
 		collisionCheck();
@@ -169,7 +179,9 @@ public class GameScreen implements ApplicationListener {
 			else if(boy.isSplit) {
 				
 				//render middle
-				
+				middle.setPosition(boy.getOrigin().x / 2 + boy.getPosition().x, boy.getOrigin().y / 2 + boy.getPosition().y);
+
+				position.set(-middle.getX() - middle.getOriginX(), -middle.getY() - middle.getOriginY(), 0);
 				model.idt();
 				temp.idt();
 				temp.setToTranslation(-position.x,-position.y,0);
@@ -177,9 +189,7 @@ public class GameScreen implements ApplicationListener {
 				temp.setToRotation(Vector3.Z, boyRotation);
 				model.mul(temp);
 				temp.setToTranslation(position);
-				model.mul(temp);
-				
-				middle.setPosition(boy.getPosition().x + middle.getOriginX() / 2, boy.getPosition().y + middle.getOriginY() / 2);
+				model.mul(temp);			
 				
 				batch.setProjectionMatrix(boyCam.combined);
 				batch.begin();
@@ -187,43 +197,60 @@ public class GameScreen implements ApplicationListener {
 				middle.draw(batch);
 				batch.end();
 				
-				
 				//render splitboy1
+				position.set(splitBoy1.split_dist, splitBoy1.split_dist,0);
+				position.rotate(Vector3.Z, boyRotation);
+				position.add(-middle.getOriginX()*2+middle.getX(),-middle.getOriginY()*2 + middle.getY(),0);
+	
+				splitBoy1.normalBoy.setPosition(position.x,position.y);
+				splitBoy1.boyBounds.setX(position.x);
+				splitBoy1.boyBounds.setY(position.y);
+		
 				model.idt();
 				temp.idt();
-				temp.setToTranslation(-position.x,-position.y,0);
-				model.mul(temp);
-				position.add(boy.splitBoy1,boy.splitBoy1,0);
-				
-				temp.setToRotation(Vector3.Z, boyRotation);
-				model.mul(temp);
-				temp.setToTranslation(position);
-				model.mul(temp);
 				
 				batch.setProjectionMatrix(boyCam.combined);
 				batch.begin();
 				batch.setTransformMatrix(model);
-				boy.getCurrentFrame(0).draw(batch);
+				splitBoy1.getCurrentFrame(0).draw(batch);
 				batch.end();
 				
 				//render splitboy2
-				position = boy.getCorrectedPosition();
+				position.set(splitBoy2.split_dist, splitBoy2.split_dist,0);
+				position.rotate(Vector3.Z, boyRotation);
+				position.add(-middle.getOriginX()*2+middle.getX(),-middle.getOriginY()*2 + middle.getY(),0);
+	
+				splitBoy2.normalBoy.setPosition(position.x,position.y);
+				splitBoy2.boyBounds.setX(position.x);
+				splitBoy2.boyBounds.setY(position.y);
 				model.idt();
 				temp.idt();
-				temp.setToTranslation(-position.x,-position.y,0);
-				model.mul(temp);
-				position.add(boy.splitBoy2,boy.splitBoy2,0);
-				
-				temp.setToRotation(Vector3.Z, boyRotation);
-				model.mul(temp);
-				temp.setToTranslation(position);
-				model.mul(temp);
 				
 				batch.setProjectionMatrix(boyCam.combined);
 				batch.begin();
 				batch.setTransformMatrix(model);
-				boy.getCurrentFrame(0).draw(batch);
+				splitBoy2.getCurrentFrame(0).draw(batch);
 				batch.end();
+				
+//				Vector3 yob = boy.getPosition().cpy();
+//				yob.x += tiled.getViewBounds().x + boy.normalBoy.getOriginX() ;
+//				yob.y += boy.normalBoy.getOriginY() ;
+//				yob.z = 0;
+//				Vector3 mid = new Vector3(middle.getX(),middle.getY(),0);
+//				mid.x += tiled.getViewBounds().x + middle.getOriginX();
+//				mid.y += middle.getOriginY();
+//				Vector3 from = new Vector3(splitBoy1.normalBoy.getX() + splitBoy1.normalBoy.getOriginX()+ tiled.getViewBounds().x, splitBoy1.normalBoy.getY() + splitBoy1.normalBoy.getOriginY() , 0);
+//				Vector3 to = new Vector3(splitBoy2.normalBoy.getX() + splitBoy2.normalBoy.getOriginX()+ tiled.getViewBounds().x, splitBoy2.normalBoy.getY()+ splitBoy1.normalBoy.getOriginY() , 0);
+//				camera.project(from);
+//				camera.project(to);
+//				camera.project(yob);
+//				camera.project(mid);
+//				r.begin(ShapeType.Line);
+//				r.setColor(1,0,0,1);
+//				r.line(from.x,from.y,to.x,to.y);
+//				r.circle(yob.x, yob.y, 2);
+//				r.circle(mid.x, mid.y, 2);
+//				r.end();
 			}
 		}
 		
@@ -297,13 +324,6 @@ public class GameScreen implements ApplicationListener {
 			int middleX = (fromX + toX) /2;
 			int middleY = (fromY + toY) /2;
 			
-	//		Gdx.app.log("", ""+ (int) newPos.x  + " " + (int) (newPos.y) );
-	//		Gdx.app.log("", layer.getCell((int) newPos.x , (int)(newPos.y)) + "");
-	//		Gdx.app.log("", "" + (int) boy.x + " " + (int)boy.y + " " + (int)boy.width + " " + (int)boy.height);
-	//		Gdx.app.log("", "" + fromX + " " + fromY + " " + toX + " " + toY + " " + middleX + " " + middleY);
-			
-	//		Gdx.app.log("", tiled.getViewBounds().toString());
-			
 			if(layer.getCell(fromX, fromY) != null)
 				boy.isdead = true;
 			else if(layer.getCell(toX, fromY) != null)
@@ -323,34 +343,13 @@ public class GameScreen implements ApplicationListener {
 			
 			{
 				//check splitboy1
-				int fromX = (int) (boy.boyBounds.x + tiled.getViewBounds().x);
-				int fromY = (int) (boy.boyBounds.y);
-				int toX = (int) (boy.boyBounds.x + boy.boyBounds.width + tiled.getViewBounds().x);
-				int toY = (int) (boy.boyBounds.y + boy.boyBounds.height);
-				
-				Vector3 from = new Vector3(boy.splitBoy1, boy.splitBoy1,0);
-				Vector3 to = new Vector3(boy.splitBoy1, boy.splitBoy1,0);
-				
-				from.rotate(Vector3.Z, boyRotation);
-				to.rotate(Vector3.Z, boyRotation);
-				
-				from.add(fromX, fromY, 0);
-				to.add(toX , toY , 0);
-				
-				fromX = (int) from.x;
-				fromY = (int) from.y;
-				toX = (int) to.x;
-				toY = (int) to.y;
+				int fromX = (int) (splitBoy1.boyBounds.x + tiled.getViewBounds().x);
+				int fromY = (int) (splitBoy1.boyBounds.y);
+				int toX = (int) (splitBoy1.boyBounds.x + splitBoy1.boyBounds.width + tiled.getViewBounds().x);
+				int toY = (int) (splitBoy1.boyBounds.y + splitBoy1.boyBounds.height);
 				
 				int middleX = (fromX + toX) /2;
 				int middleY = (fromY + toY) /2;
-				
-		//		Gdx.app.log("", ""+ (int) newPos.x  + " " + (int) (newPos.y) );
-		//		Gdx.app.log("", layer.getCell((int) newPos.x , (int)(newPos.y)) + "");
-		//		Gdx.app.log("", "" + (int) boy.x + " " + (int)boy.y + " " + (int)boy.width + " " + (int)boy.height);
-		//		Gdx.app.log("", "" + fromX + " " + fromY + " " + toX + " " + toY + " " + middleX + " " + middleY);
-				
-		//		Gdx.app.log("", tiled.getViewBounds().toString());
 				
 				if(layer.getCell(fromX, fromY) != null)
 					boy.isdead = true;
@@ -369,24 +368,32 @@ public class GameScreen implements ApplicationListener {
 			}
 			{
 				//check splitboy2
-				int fromX = (int) (boy.boyBounds.x + tiled.getViewBounds().x);
-				int fromY = (int) (boy.boyBounds.y);
-				int toX = (int) (boy.boyBounds.x + boy.boyBounds.width + tiled.getViewBounds().x);
-				int toY = (int) (boy.boyBounds.y + boy.boyBounds.height);
+				int fromX = (int) (splitBoy2.boyBounds.x + tiled.getViewBounds().x);
+				int fromY = (int) (splitBoy2.boyBounds.y);
+				int toX = (int) (splitBoy2.boyBounds.x + splitBoy2.boyBounds.width + tiled.getViewBounds().x);
+				int toY = (int) (splitBoy2.boyBounds.y + splitBoy2.boyBounds.height);
 				
-				Vector3 from = new Vector3(boy.splitBoy2, boy.splitBoy2,0);
-				Vector3 to = new Vector3(boy.splitBoy2, boy.splitBoy2,0);
+//				Vector3 from = new Vector3(splitBoy2.split_dist, splitBoy2.split_dist,0);
+//				Vector3 to = new Vector3(splitBoy2.split_dist, splitBoy2.split_dist,0);
+//				
+//				from.rotate(Vector3.Z, boyRotation);
+//				to.rotate(Vector3.Z, boyRotation);
+//				
+//				from.add(fromX, fromY, 0);
+//				to.add(toX , toY , 0);
+//				
+//				fromX = (int) from.x;
+//				fromY = (int) from.y;
+//				toX = (int) to.x;
+//				toY = (int) to.y;
 				
-				from.rotate(Vector3.Z, boyRotation);
-				to.rotate(Vector3.Z, boyRotation);
-				
-				from.add(fromX, fromY, 0);
-				to.add(toX , toY , 0);
-				
-				fromX = (int) from.x;
-				fromY = (int) from.y;
-				toX = (int) to.x;
-				toY = (int) to.y;
+//				camera.project(from);
+//				camera.project(to);
+//				r.begin(ShapeType.Line);
+//				r.setColor(1, 0, 0, 1);
+//				r.rect(from.x, from.y, to.x - from.x, to.y - from.y);
+//				r.line(from.x, from.y, to.x, to.y);
+//				r.end();
 				
 				int middleX = (fromX + toX) /2;
 				int middleY = (fromY + toY) /2;
@@ -416,7 +423,7 @@ public class GameScreen implements ApplicationListener {
 
 		}
 		
-//		if(boy.isSplit && boy.splitBoy1 <= boy.SPLIT_DISTANCE)
+		if(boy.isSplit && splitBoy1.split_dist <= splitBoy1.SPLIT_DISTANCE)
 			boy.isdead = false;
 		
 	}
@@ -425,6 +432,8 @@ public class GameScreen implements ApplicationListener {
 	public void resize(int width, int height) {
 		boy.normalBoy.setOrigin(boy.normalBoy.getWidth()/2, boy.normalBoy.getHeight()/2);
 		boy.normalBoy.setPosition(camera.viewportWidth / 4, camera.viewportHeight / 2);
+		middle.setOrigin(middle.getWidth()/2, middle.getHeight()/2);
+		middle.setPosition(width/4,height/2);	
 	}
 
 	@Override
