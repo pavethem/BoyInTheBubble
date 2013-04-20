@@ -87,7 +87,7 @@ public class Boy {
 	
 	public boolean split() {
 		
-		isSplit = true;
+		isSplit = !isSplit;
 		
 		return isSplit;
 		

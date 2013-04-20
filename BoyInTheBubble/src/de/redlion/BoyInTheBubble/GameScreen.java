@@ -63,6 +63,7 @@ public class GameScreen implements ApplicationListener {
 	OrthoCamController camController;
 	
 	static float boyRotation = 0;
+	float splitRotation = 0;
 	final float ROTATION_MULTIPLIER = 20;
 	
 	ShapeRenderer r;
@@ -115,6 +116,7 @@ public class GameScreen implements ApplicationListener {
 		fade = 1.0f;
 		
 		boyRotation = 0;
+		splitRotation = 0;
 	}
 
 	@Override
@@ -130,13 +132,15 @@ public class GameScreen implements ApplicationListener {
 		Gdx.gl.glClearColor(1, 1, 1, 1);
 		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
 		
-		delta = Math.min(0.1f, Gdx.graphics.getDeltaTime());
-		
-		if(!boy.isdead)
-			boyRotation -= Gdx.graphics.getDeltaTime() * ROTATION_MULTIPLIER;
-		
+		delta = Math.min(0.1f, Gdx.graphics.getDeltaTime());		
 		
 		if(!boy.isdead) {
+			if(!boy.isSplit && splitBoy1.split_dist <= 0) {
+				boyRotation -= Gdx.graphics.getDeltaTime() * ROTATION_MULTIPLIER;
+				splitRotation = boyRotation;
+			} else {
+				splitRotation -= Gdx.graphics.getDeltaTime() * ROTATION_MULTIPLIER;
+			}
 			camera.translate(Gdx.graphics.getDeltaTime() * 2, 0);
 			camera.update();
 			tiled.setView(camera);
@@ -144,6 +148,9 @@ public class GameScreen implements ApplicationListener {
 		tiled.render();
 		
 		if(boy.isSplit) {
+			splitBoy1.normalBoy.setRotation(boyRotation);
+			splitBoy2.normalBoy.setRotation(boyRotation);
+			
 			if(splitBoy1.split_dist <= splitBoy1.SPLIT_DISTANCE) {
 				splitBoy1.normalBoy.setPosition(splitBoy1.normalBoy.getX(),splitBoy1.normalBoy.getY() + Gdx.graphics.getDeltaTime());
 				splitBoy1.split_dist += Gdx.graphics.getDeltaTime();
@@ -151,6 +158,15 @@ public class GameScreen implements ApplicationListener {
 			if(splitBoy2.split_dist >= -splitBoy2.SPLIT_DISTANCE) {
 				splitBoy2.normalBoy.setPosition(splitBoy2.normalBoy.getX(),splitBoy2.normalBoy.getY() - Gdx.graphics.getDeltaTime());
 				splitBoy2.split_dist -= Gdx.graphics.getDeltaTime();
+			}
+		} else {
+			if(splitBoy1.split_dist >= 0) {
+				splitBoy1.normalBoy.setPosition(splitBoy1.normalBoy.getX(),splitBoy1.normalBoy.getY() - Gdx.graphics.getDeltaTime());
+				splitBoy1.split_dist -= Gdx.graphics.getDeltaTime();
+			}
+			if(splitBoy2.split_dist <= 0) {
+				splitBoy2.normalBoy.setPosition(splitBoy2.normalBoy.getX(),splitBoy2.normalBoy.getY() + Gdx.graphics.getDeltaTime());
+				splitBoy2.split_dist += Gdx.graphics.getDeltaTime();
 			}
 		}
 		
@@ -160,7 +176,7 @@ public class GameScreen implements ApplicationListener {
 			
 			Vector3 position = boy.getCorrectedPosition();
 			
-			if(!boy.isSplit) {
+			if(!boy.isSplit && splitBoy1.split_dist <= 0) {
 				model.idt();
 				temp.idt();
 				temp.setToTranslation(-position.x,-position.y,0);
@@ -176,7 +192,7 @@ public class GameScreen implements ApplicationListener {
 				boy.getCurrentFrame(0).draw(batch);
 				batch.end();
 			}
-			else if(boy.isSplit) {
+			else if(boy.isSplit || splitBoy1.split_dist >= 0) {
 				
 				//render middle
 				middle.setPosition(boy.getOrigin().x / 2 + boy.getPosition().x, boy.getOrigin().y / 2 + boy.getPosition().y);
@@ -186,7 +202,7 @@ public class GameScreen implements ApplicationListener {
 				temp.idt();
 				temp.setToTranslation(-position.x,-position.y,0);
 				model.mul(temp);
-				temp.setToRotation(Vector3.Z, boyRotation);
+				temp.setToRotation(Vector3.Z, splitRotation);
 				model.mul(temp);
 				temp.setToTranslation(position);
 				model.mul(temp);			
@@ -199,7 +215,7 @@ public class GameScreen implements ApplicationListener {
 				
 				//render splitboy1
 				position.set(splitBoy1.split_dist, splitBoy1.split_dist,0);
-				position.rotate(Vector3.Z, boyRotation);
+				position.rotate(Vector3.Z, splitRotation);
 				position.add(-middle.getOriginX()*2+middle.getX(),-middle.getOriginY()*2 + middle.getY(),0);
 	
 				splitBoy1.normalBoy.setPosition(position.x,position.y);
@@ -217,7 +233,7 @@ public class GameScreen implements ApplicationListener {
 				
 				//render splitboy2
 				position.set(splitBoy2.split_dist, splitBoy2.split_dist,0);
-				position.rotate(Vector3.Z, boyRotation);
+				position.rotate(Vector3.Z, splitRotation);
 				position.add(-middle.getOriginX()*2+middle.getX(),-middle.getOriginY()*2 + middle.getY(),0);
 	
 				splitBoy2.normalBoy.setPosition(position.x,position.y);
@@ -424,6 +440,8 @@ public class GameScreen implements ApplicationListener {
 		}
 		
 		if(boy.isSplit && splitBoy1.split_dist <= splitBoy1.SPLIT_DISTANCE)
+			boy.isdead = false;
+		if(!boy.isSplit && splitBoy1.split_dist > 0)
 			boy.isdead = false;
 		
 	}
