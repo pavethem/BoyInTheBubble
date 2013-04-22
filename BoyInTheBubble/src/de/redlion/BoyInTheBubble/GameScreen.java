@@ -341,23 +341,15 @@ public class GameScreen implements ApplicationListener {
 			int fromY = (int) (boy.boyBounds.y);
 			int toX = (int) (boy.boyBounds.x + boy.boyBounds.width + tiled.getViewBounds().x);
 			int toY = (int) (boy.boyBounds.y + boy.boyBounds.height);
-			int middleX = (fromX + toX) /2;
-			int middleY = (fromY + toY) /2;
 			
-			if(layer.getCell(fromX, fromY) != null)
-				boy.isdead = true;
-			else if(layer.getCell(toX, fromY) != null)
-				boy.isdead = true;
-			else if(layer.getCell(fromX, toY) != null)
-				boy.isdead = true;
-			else if(layer.getCell(toX, toY) != null)
-				boy.isdead = true;
-			else if(layer.getCell(middleX, toY) != null)
-				boy.isdead = true;
-			else if(layer.getCell(toX, middleY) != null)
-				boy.isdead = true;
-			else if(layer.getCell(middleX, middleY) != null)
-				boy.isdead = true;
+			
+			for(int x = fromX; x<=toX;x++) {
+				for(int y = fromY; y<=toY;y++) {
+					if(layer.getCell(x, y) != null)
+						boy.isdead = true;
+				}
+			}
+			
 		}
 		else {
 			
@@ -369,23 +361,12 @@ public class GameScreen implements ApplicationListener {
 					int toX = (int) (splitBoy1.boyBounds.x + splitBoy1.boyBounds.width + tiled.getViewBounds().x);
 					int toY = (int) (splitBoy1.boyBounds.y + splitBoy1.boyBounds.height);
 					
-					int middleX = (fromX + toX) /2;
-					int middleY = (fromY + toY) /2;
-					
-					if(layer.getCell(fromX, fromY) != null)
-						splitBoy1.isdead = true;
-					else if(layer.getCell(toX, fromY) != null)
-						splitBoy1.isdead = true;
-					else if(layer.getCell(fromX, toY) != null)
-						splitBoy1.isdead = true;
-					else if(layer.getCell(toX, toY) != null)
-						splitBoy1.isdead = true;
-					else if(layer.getCell(middleX, toY) != null)
-						splitBoy1.isdead = true;
-					else if(layer.getCell(toX, middleY) != null)
-						splitBoy1.isdead = true;
-					else if(layer.getCell(middleX, middleY) != null)
-						splitBoy1.isdead = true;
+					for(int x = fromX; x<=toX;x++) {
+						for(int y = fromY; y<=toY;y++) {
+							if(layer.getCell(x, y) != null)
+								splitBoy1.isdead = true;
+						}
+					}
 				}
 			}
 			{
@@ -418,9 +399,6 @@ public class GameScreen implements ApplicationListener {
 	//				r.line(from.x, from.y, to.x, to.y);
 	//				r.end();
 					
-					int middleX = (fromX + toX) /2;
-					int middleY = (fromY + toY) /2;
-					
 			//		Gdx.app.log("", ""+ (int) newPos.x  + " " + (int) (newPos.y) );
 			//		Gdx.app.log("", layer.getCell((int) newPos.x , (int)(newPos.y)) + "");
 			//		Gdx.app.log("", "" + (int) boy.x + " " + (int)boy.y + " " + (int)boy.width + " " + (int)boy.height);
@@ -428,20 +406,12 @@ public class GameScreen implements ApplicationListener {
 					
 			//		Gdx.app.log("", tiled.getViewBounds().toString());
 					
-					if(layer.getCell(fromX, fromY) != null)
-						splitBoy2.isdead = true;
-					else if(layer.getCell(toX, fromY) != null)
-						splitBoy2.isdead = true;
-					else if(layer.getCell(fromX, toY) != null)
-						splitBoy2.isdead = true;
-					else if(layer.getCell(toX, toY) != null)
-						splitBoy2.isdead = true;
-					else if(layer.getCell(middleX, toY) != null)
-						splitBoy2.isdead = true;
-					else if(layer.getCell(toX, middleY) != null)
-						splitBoy2.isdead = true;
-					else if(layer.getCell(middleX, middleY) != null)
-						splitBoy2.isdead = true;
+					for(int x = fromX; x<=toX;x++) {
+						for(int y = fromY; y<=toY;y++) {
+							if(layer.getCell(x, y) != null)
+								splitBoy2.isdead = true;
+						}
+					}
 				}
 			}
 

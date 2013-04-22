@@ -157,9 +157,17 @@ public class OrthoCamController extends InputAdapter {
 		camera.project(pos);
 		
 		float w = Resources.getInstance().boyTextures.getRegions().get(0).originalWidth;
-		w += 0.1f * w;
+		if(GameScreen.boy.isBig)
+			w *= 2;
+		else if(GameScreen.boy.isSmall)
+			w /= 2;
+		w += 0.2f * w;
 		float h = Resources.getInstance().boyTextures.getRegions().get(0).originalHeight;
-		h += 0.1f * h;
+		if(GameScreen.boy.isBig)
+			h *= 2;
+		else if(GameScreen.boy.isSmall)
+			h /= 2;
+		h += 0.2f * h;
 		
 		Rectangle box = new Rectangle(pos.x, pos.y, w,h);
 		
@@ -204,6 +212,10 @@ public class OrthoCamController extends InputAdapter {
 		
 		if(keycode == Keys.S)
 			GameScreen.boy.split();
+		if(keycode == Keys.G)
+			GameScreen.boy.enlarge();
+		if(keycode == Keys.K)
+			GameScreen.boy.shrink();
 		return true;
 	}
 	
