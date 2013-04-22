@@ -67,6 +67,8 @@ public class GameScreen implements ApplicationListener {
 	float splitRotation = 0;
 	final float ROTATION_MULTIPLIER = 20;
 	
+	boolean readjustment;
+	
 	ShapeRenderer r;
 	
 	@Override
@@ -119,6 +121,8 @@ public class GameScreen implements ApplicationListener {
 		lastPosition = new Vector3(0, 0, 0);
 		boyRotation = 0;
 		splitRotation = 0;
+		
+		readjustment = false;
 	}
 
 	@Override
@@ -187,6 +191,45 @@ public class GameScreen implements ApplicationListener {
 				model.mul(temp);
 				temp.setToTranslation(position);
 				model.mul(temp);
+				
+				if(boy.isBig && boy.sizeModifier < boy.MAX_GROWTH_MOD) {
+					readjustment = false;
+					boy.sizeModifier += Gdx.graphics.getDeltaTime() / 20;
+					boy.normalBoy.setBounds(boy.normalBoy.getX(), boy.normalBoy.getY(), boy.normalBoy.getWidth() * boy.sizeModifier, boy.normalBoy.getHeight() * boy.sizeModifier);
+					boy.normalBoy.setOrigin(boy.normalBoy.getOriginX() * boy.sizeModifier, boy.normalBoy.getOriginY() * boy.sizeModifier);
+					boy.boyBounds.set(boy.normalBoy.getBoundingRectangle());
+					
+				} 
+				else if (!boy.isBig && boy.normalBoy.getWidth() >= 1.5001f) {
+
+					if(boy.sizeModifier > 1.0f) {
+						boy.sizeModifier -= Gdx.graphics.getDeltaTime() / 20;
+						readjustment = false;
+					}
+					else {
+						boy.sizeModifier = 1.0f;
+						readjustment = true;
+					}
+					
+					
+					boy.normalBoy.setBounds(boy.normalBoy.getX(), boy.normalBoy.getY(), boy.normalBoy.getWidth() / boy.sizeModifier, boy.normalBoy.getHeight() / boy.sizeModifier);
+					boy.normalBoy.setOrigin(boy.normalBoy.getOriginX() / boy.sizeModifier, boy.normalBoy.getOriginY() / boy.sizeModifier);
+					boy.boyBounds.set(boy.normalBoy.getBoundingRectangle());
+					
+					
+				}
+				
+				if(readjustment) {
+					float mod = boy.normalBoy.getWidth() / 1.5f;
+					mod -= Gdx.graphics.getDeltaTime() / 20;
+					System.out.println(mod + "");
+					boy.normalBoy.setBounds(boy.normalBoy.getX(), boy.normalBoy.getY(), mod * 1.5f, mod * 1.5f);
+					boy.normalBoy.setOrigin(boy.normalBoy.getWidth()/2, boy.normalBoy.getHeight()/2);
+					boy.boyBounds.set(boy.normalBoy.getBoundingRectangle());
+					System.out.println(boy.boyBounds.toString());
+					if(boy.normalBoy.getWidth() <= 1.5f)
+						readjustment = false;
+				}
 				
 				batch.setProjectionMatrix(boyCam.combined);
 				batch.begin();
