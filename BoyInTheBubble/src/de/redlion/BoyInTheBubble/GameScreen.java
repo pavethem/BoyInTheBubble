@@ -300,7 +300,6 @@ public class GameScreen implements ApplicationListener {
 						batch.setProjectionMatrix(boyCam.combined);
 						batch.begin();
 						batch.setTransformMatrix(model);
-						System.out.println(10*(boy.positions.indexOf(p, false) + 1));
 						boy.getCurrentFrame(0).draw(batch, 10 * (boy.positions.indexOf(p, false) + 1));
 						batch.end();
 					}
@@ -531,6 +530,22 @@ public class GameScreen implements ApplicationListener {
 				for(int y = fromY; y<=toY;y++) {
 					if(layer.getCell(x, y) != null)
 						boy.isdead = true;
+				}
+			}
+			
+			if(boy.hasTail) {
+				for(Vector3 p : boy.positions) {
+					fromX = (int) (-p.x + tiled.getViewBounds().x);
+					fromY = (int) (-p.y);
+					toX = (int) (-p.x - boy.getOrigin().x + boy.boyBounds.width + tiled.getViewBounds().x);
+					toY = (int) (-p.y - boy.getOrigin().y + boy.boyBounds.height);
+					
+					for(int x = fromX; x<=toX;x++) {
+						for(int y = fromY; y<=toY;y++) {
+							if(layer.getCell(x, y) != null)
+								boy.isdead = true;
+						}
+					}
 				}
 			}
 			
