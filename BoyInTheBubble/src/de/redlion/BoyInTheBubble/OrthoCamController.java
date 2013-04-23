@@ -212,9 +212,9 @@ public class OrthoCamController extends InputAdapter {
 		
 		if(keycode == Keys.S)
 			GameScreen.boy.split();
-		if(keycode == Keys.G)
+		if(keycode == Keys.A)
 			GameScreen.boy.enlarge();
-		if(keycode == Keys.K)
+		if(keycode == Keys.D)
 			GameScreen.boy.shrink();
 		return true;
 	}

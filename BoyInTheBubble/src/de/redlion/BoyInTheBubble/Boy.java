@@ -27,7 +27,7 @@ public class Boy {
 	
 	public final float SPLIT_DISTANCE = 1.4f;
 	public final float MAX_GROWTH_MOD = 1.03f;
-	public final float MAX_SHRINK_MOD = 2.0f;
+	public final float MAX_SHRINK_MOD = 1.03f;
 	
 	public Boy(float width, float height) {
 		
@@ -109,16 +109,6 @@ public class Boy {
 	public boolean shrink() {
 		isSmall = !isSmall;
 		isBig = false;
-		
-		if(isSmall) {
-			normalBoy.setBounds(normalBoy.getX(), normalBoy.getY(), normalBoy.getWidth() / 2, normalBoy.getHeight() / 2);
-			normalBoy.setOrigin(normalBoy.getOriginX() / 2, normalBoy.getOriginY() / 2);
-			boyBounds.set(normalBoy.getBoundingRectangle());
-		} else {
-			normalBoy.setBounds(normalBoy.getX(), normalBoy.getY(), normalBoy.getWidth() * 2, normalBoy.getHeight() * 2);
-			normalBoy.setOrigin(normalBoy.getOriginX() * 2, normalBoy.getOriginY() * 2);
-			boyBounds.set(normalBoy.getBoundingRectangle());
-		}
 		
 		return isSmall;
 	}
