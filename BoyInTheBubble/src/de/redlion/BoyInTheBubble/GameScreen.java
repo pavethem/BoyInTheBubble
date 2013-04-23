@@ -210,7 +210,6 @@ public class GameScreen implements ApplicationListener {
 					boy.normalBoy.setBounds(boy.normalBoy.getX(), boy.normalBoy.getY(), boy.normalBoy.getWidth() * boy.sizeModifier, boy.normalBoy.getHeight() * boy.sizeModifier);
 					boy.normalBoy.setOrigin(boy.normalBoy.getOriginX() * boy.sizeModifier, boy.normalBoy.getOriginY() * boy.sizeModifier);
 					boy.boyBounds.set(boy.normalBoy.getBoundingRectangle());
-					
 				} 
 				else if (!boy.isBig && boy.normalBoy.getWidth() >= 1.5001f) {
 
@@ -284,6 +283,7 @@ public class GameScreen implements ApplicationListener {
 				batch.setProjectionMatrix(boyCam.combined);
 				batch.begin();
 				batch.setTransformMatrix(model);
+				
 				boy.getCurrentFrame(0).draw(batch);
 				batch.end();
 				
@@ -633,6 +633,8 @@ public class GameScreen implements ApplicationListener {
 		
 		if(splitBoy1.isdead && splitBoy2.isdead)
 			boy.isdead = true;
+		
+		boy.isdead = false;
 		
 	}
 

@@ -99,6 +99,8 @@ public class Boy {
 		isBig = !isBig;
 		isSmall = false;
 		
+		if(isBig)
+			normalBoy.setSize(1.5f, 1.5f);
 		return isBig;
 	}
 	
@@ -106,12 +108,15 @@ public class Boy {
 		isSmall = !isSmall;
 		isBig = false;
 		
+		if(isSmall)
+			normalBoy.setSize(1.5f, 1.5f);
+		
 		return isSmall;
 	}
 	
 	public boolean tail() {
 		hasTail = !hasTail;
-		
+		positions.clear();
 		return hasTail;
 	}
 	

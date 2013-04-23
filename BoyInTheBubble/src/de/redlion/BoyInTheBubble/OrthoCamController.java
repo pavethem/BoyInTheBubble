@@ -26,13 +26,8 @@ public class OrthoCamController extends InputAdapter {
 	
 	private Rectangle normalBoy;
 	
-	private int SCREEN_BIAS_X;
-	private int SCREEN_BIAS_Y;
-	
 	public OrthoCamController (OrthographicCamera camera) {
 		this.camera = camera;
-		SCREEN_BIAS_X = (int) (Gdx.graphics.getWidth() / 40);
-		SCREEN_BIAS_Y = (int) (Gdx.graphics.getHeight() / 20);
 	}
 	
 	@Override
@@ -46,32 +41,38 @@ public class OrthoCamController extends InputAdapter {
 		
 		if(touched) {
 			
-			//TODO: bias definieren, da er oben und rechts manchmal noch rausrutscht...
+			float sizemod = 1.0f;
+			if(GameScreen.boy.isBig)
+				sizemod = (GameScreen.boy.normalBoy.getWidth() / 1.5f);
+			else if(GameScreen.boy.isSmall)
+				sizemod = (GameScreen.boy.normalBoy.getWidth() / 1.5f);
+			
+			int size = (int) (Resources.getInstance().boyTextures.getRegions().get(0).originalWidth * sizemod); 
 			
 //			if(!GameScreen.boy.isSplit) {
 				if(screenOffsetX > 0) {
-					if(x + ((Resources.getInstance().boyTextures.getRegions().get(0).originalWidth / 2) - screenOffsetX) < Resources.getInstance().boyTextures.getRegions().get(0).originalWidth)
+					if(x - screenOffsetX - (size/2) <= 0)
 						x = (int) last.x;
-					else if(x + ((Resources.getInstance().boyTextures.getRegions().get(0).originalWidth) - screenOffsetX) >= Gdx.graphics.getWidth() + SCREEN_BIAS_X)
+					else if(x +(size/2 - screenOffsetX) >= Gdx.graphics.getWidth())
 						x = (int) last.x;
 				}
 				else {
-					if(x - ((Resources.getInstance().boyTextures.getRegions().get(0).originalWidth / 2) + screenOffsetX) < 0)
+					if(x - ((size / 2) + screenOffsetX) < 0)
 						x = (int) last.x;
-					else if(x - screenOffsetX + (Resources.getInstance().boyTextures.getRegions().get(0).originalWidth / 2) >= Gdx.graphics.getWidth())
+					else if(x - screenOffsetX + (size / 2) >= Gdx.graphics.getWidth())
 						x = (int) last.x;
 				}
 				
 				if(screenOffsetY > 0) {
-					if(y + ((Resources.getInstance().boyTextures.getRegions().get(0).originalHeight) + screenOffsetY) >= Gdx.graphics.getHeight() + SCREEN_BIAS_Y)
+					if(y + ((size/2) + screenOffsetY) >= Gdx.graphics.getHeight() )
 						y = (int) last.y;
-					else if(y + ((Resources.getInstance().boyTextures.getRegions().get(0).originalHeight) + screenOffsetY) < Resources.getInstance().boyTextures.getRegions().get(0).originalHeight + SCREEN_BIAS_Y)
+					else if(y - ((size/2) - screenOffsetY) < 0)
 						y = (int) last.y;
 				}
 				else {
-					if(y + ((Resources.getInstance().boyTextures.getRegions().get(0).originalHeight) + screenOffsetY) >= Gdx.graphics.getHeight() + SCREEN_BIAS_Y)
+					if(y + ((size/2) + screenOffsetY) >= Gdx.graphics.getHeight() )
 						y = (int) last.y;
-					else if(y + screenOffsetY - Resources.getInstance().boyTextures.getRegions().get(0).originalHeight / 2 < 0) {
+					else if(y + screenOffsetY - size / 2 < 0) {
 						y = (int) last.y;
 					}
 				}
@@ -174,10 +175,16 @@ public class OrthoCamController extends InputAdapter {
 		if(box.contains(x,y) && !GameScreen.boy.isdead) {
 			touched = true;
 			
-			float centerX = normalBoy.getX() + normalBoy.getWidth() / 2;
-			float screenCenterX = box.x + Resources.getInstance().boyTextures.getRegions().get(0).originalWidth / 2;
-			float centerY = normalBoy.getY() - normalBoy.getHeight()/2;
-			float screenCenterY = box.y + Resources.getInstance().boyTextures.getRegions().get(0).originalWidth / 2;
+			float sizemod = 1.0f;
+			if(GameScreen.boy.isBig)
+				sizemod = 1 + GameScreen.boy.normalBoy.getWidth() - 1.5f;
+			else if(GameScreen.boy.isSmall)
+				sizemod = 1.5f - GameScreen.boy.normalBoy.getWidth();
+			
+			float centerX = normalBoy.getX() + (normalBoy.getWidth() * GameScreen.boy.sizeModifier) / 2;
+			float screenCenterX = box.x + (Resources.getInstance().boyTextures.getRegions().get(0).originalWidth * sizemod) / 2;
+			float centerY = normalBoy.getY() - (normalBoy.getHeight() * GameScreen.boy.sizeModifier)/2;
+			float screenCenterY = box.y + (Resources.getInstance().boyTextures.getRegions().get(0).originalHeight * sizemod) / 2;
 			
 			if(centerX > newPos.x) {
 				offsetX = -centerX + newPos.x;
