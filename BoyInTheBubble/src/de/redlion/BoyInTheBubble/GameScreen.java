@@ -62,7 +62,8 @@ public class GameScreen implements ApplicationListener {
 	
 	OrthoCamController camController;
 	
-	Vector3 lastPosition; 
+	Vector3 lastPosition;
+	Vector3 lastPositionBeforeDeath; 
 	static float boyRotation = 0;
 	float splitRotation = 0;
 	final float ROTATION_MULTIPLIER = 20;
@@ -120,6 +121,8 @@ public class GameScreen implements ApplicationListener {
 		fade = 1.0f;
 		
 		lastPosition = new Vector3(0, 0, 0);
+		
+		lastPositionBeforeDeath = new Vector3(0, 0, 0);
 		boyRotation = 0;
 		splitRotation = 0;
 		
@@ -193,6 +196,13 @@ public class GameScreen implements ApplicationListener {
 				model.mul(temp);
 				temp.setToTranslation(position);
 				model.mul(temp);
+				
+				if(boy.hasTail) {
+					if(lastPosition.dst(boy.getCorrectedPosition()) > 0.5f) {
+						boy.updateTail(boy.getCorrectedPosition());
+						lastPosition.set(boy.getCorrectedPosition());
+					}
+				}
 				
 				if(boy.isBig && boy.sizeModifier < boy.MAX_GROWTH_MOD) {
 					readjustmentBig = false;
@@ -276,6 +286,25 @@ public class GameScreen implements ApplicationListener {
 				batch.setTransformMatrix(model);
 				boy.getCurrentFrame(0).draw(batch);
 				batch.end();
+				
+				if(boy.hasTail) {
+					for(Vector3 p : boy.positions) {
+						model.idt();
+						temp.idt();
+						temp.setToTranslation(-p.x ,-p.y ,0);
+						model.mul(temp);
+						temp.setToRotation(Vector3.Z, boyRotation);
+						model.mul(temp);
+						temp.setToTranslation(position);
+						model.mul(temp);
+						batch.setProjectionMatrix(boyCam.combined);
+						batch.begin();
+						batch.setTransformMatrix(model);
+						System.out.println(10*(boy.positions.indexOf(p, false) + 1));
+						boy.getCurrentFrame(0).draw(batch, 10 * (boy.positions.indexOf(p, false) + 1));
+						batch.end();
+					}
+				}
 			}
 			else if(boy.isSplit || splitBoy1.split_dist >= 0) {
 				
@@ -367,7 +396,7 @@ public class GameScreen implements ApplicationListener {
 			Sprite deadBoy = new Sprite(splitBoy1.getCurrentFrame(stateTime));
 			
 			deadBoy.setSize(splitBoy1.boyBounds.width, splitBoy1.boyBounds.height);
-			deadBoy.setPosition(lastPosition.x,splitBoy1.getPosition().y);
+			deadBoy.setPosition(lastPositionBeforeDeath.x,splitBoy1.getPosition().y);
 			deadBoy.setOrigin(splitBoy1.getOrigin().x, splitBoy1.getOrigin().y);
 			deadBoy.setRotation(boyRotation);
 			model.idt();
@@ -402,7 +431,7 @@ public class GameScreen implements ApplicationListener {
 			Sprite deadBoy = new Sprite(splitBoy2.getCurrentFrame(stateTime));
 			
 			deadBoy.setSize(splitBoy2.boyBounds.width, splitBoy2.boyBounds.height);
-			deadBoy.setPosition(lastPosition.x,splitBoy2.getPosition().y);
+			deadBoy.setPosition(lastPositionBeforeDeath.x,splitBoy2.getPosition().y);
 			deadBoy.setOrigin(splitBoy2.getOrigin().x, splitBoy2.getOrigin().y);
 			deadBoy.setRotation(boyRotation);
 			model.idt();
@@ -520,7 +549,7 @@ public class GameScreen implements ApplicationListener {
 						for(int y = fromY; y<=toY;y++) {
 							if(layer.getCell(x, y) != null) {
 								splitBoy1.isdead = true;
-								lastPosition = splitBoy1.getPosition();
+								lastPositionBeforeDeath = splitBoy1.getPosition();
 							}
 						}
 					}
@@ -567,7 +596,7 @@ public class GameScreen implements ApplicationListener {
 						for(int y = fromY; y<=toY;y++) {
 							if(layer.getCell(x, y) != null) {
 								splitBoy2.isdead = true;
-								lastPosition = splitBoy2.getPosition();
+								lastPositionBeforeDeath = splitBoy2.getPosition();
 							}
 						}
 					}

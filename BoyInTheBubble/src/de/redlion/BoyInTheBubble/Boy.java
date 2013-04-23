@@ -29,18 +29,14 @@ public class Boy {
 	public final float MAX_GROWTH_MOD = 1.03f;
 	public final float MAX_SHRINK_MOD = 1.03f;
 	
+	public boolean hasTail = false;
+	public final int MAX_POSITIONS = 10;
+	public Array<Vector3> positions = new Array<Vector3>(MAX_POSITIONS);
+	
 	public Boy(float width, float height) {
 		
 		boyTex = Resources.getInstance().boyTextures;
 		boySprites = boyTex.createSprites();
-		
-//		for(Sprite s : boy) {
-//		
-//			s.getTexture().setFilter(TextureFilter.Linear, TextureFilter.Linear);
-//			s.setSize(1.5f, 1.5f);
-//			s.setOrigin(s.getWidth()/2, s.getHeight()/2);
-//			s.setPosition(camera.viewportWidth / 2, camera.viewportHeight / 2);
-//		}
 		
 		death = new Animation(0.06f, boyTex.getRegions());
 		death.setPlayMode(Animation.NORMAL);
@@ -111,6 +107,22 @@ public class Boy {
 		isBig = false;
 		
 		return isSmall;
+	}
+	
+	public boolean tail() {
+		hasTail = !hasTail;
+		
+		return hasTail;
+	}
+	
+	public void updateTail(Vector3 position) {
+		if(positions.size < MAX_POSITIONS) {
+			positions.insert(0, position);
+		}
+		else {
+			positions.pop();
+			positions.insert(0, position);
+		}
 	}
 	
 }
