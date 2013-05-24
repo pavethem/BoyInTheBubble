@@ -5,8 +5,19 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
 
 public class CollisionDetector {
+	
+	Spawner spawner;
+	
+	public CollisionDetector(TiledMapTileLayer layer) {
+		spawner = new Spawner(layer.getWidth(),layer.getHeight());
+	}
 
 	public void collisionCheck(Boy boy, TiledMapTileLayer layer, Rectangle viewBounds) {
+		
+		for(int y = (int) spawner.area.y; y<spawner.area.getHeight();y++) {
+			if(layer.getCell((int) spawner.area.x, y) != null)
+				System.out.println("das");
+		}
 		
 		if(!boy.isSplit) {
 			int fromX = (int) (boy.boyBounds.x + viewBounds.x);
