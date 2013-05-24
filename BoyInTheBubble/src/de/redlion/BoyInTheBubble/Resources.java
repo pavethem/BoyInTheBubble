@@ -28,13 +28,13 @@ public class Resources {
 	public Resources() {		
 		reInit();	
 	}
-	
 
-	public void reInit() {			
+	public void reInit() {		
 		boyTextures = new TextureAtlas(Gdx.files.internal("data/boy.pack"));
 		middle = new Texture(Gdx.files.internal("data/middle.png"));
 //		boyTex = boyTextures.getRegions().get(0).getTexture();
-		map = new TmxMapLoader().load("./data/map.tmx");
+		System.out.println(Gdx.files.getLocalStoragePath());
+		map = new TmxMapLoader().load(Gdx.files.internal("data/test.tmx").toString());
 	}
 
 	public void dispose() {

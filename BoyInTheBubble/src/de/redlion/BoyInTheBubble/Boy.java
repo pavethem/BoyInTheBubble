@@ -1,5 +1,6 @@
 package de.redlion.BoyInTheBubble;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Sprite;
@@ -25,6 +26,9 @@ public class Boy {
 	public float split_dist;
 	public float sizeModifier;
 	
+	public float originalSize = 3f; // macht 120px
+	public int size = 120;
+	
 	public final float SPLIT_DISTANCE = 1.4f;
 	public final float MAX_GROWTH_MOD = 1.03f;
 	public final float MAX_SHRINK_MOD = 1.03f;
@@ -44,7 +48,7 @@ public class Boy {
 		normalBoy = boySprites.get(0);
 		
 		normalBoy.getTexture().setFilter(TextureFilter.Linear, TextureFilter.Linear);
-		normalBoy.setSize(1.5f, 1.5f);
+		normalBoy.setSize(originalSize, originalSize);
 		normalBoy.setOrigin(normalBoy.getWidth()/2, normalBoy.getHeight()/2);
 		normalBoy.setPosition(width / 4, height / 2);
 		
@@ -100,7 +104,7 @@ public class Boy {
 		isSmall = false;
 		
 		if(isBig)
-			normalBoy.setSize(1.5f, 1.5f);
+			normalBoy.setSize(originalSize, originalSize);
 		return isBig;
 	}
 	
@@ -109,7 +113,7 @@ public class Boy {
 		isBig = false;
 		
 		if(isSmall)
-			normalBoy.setSize(1.5f, 1.5f);
+			normalBoy.setSize(originalSize, originalSize);
 		
 		return isSmall;
 	}

@@ -89,9 +89,9 @@ public class GameScreen implements ApplicationListener {
 		boyCam = new OrthographicCamera(1, h/w);
 		batch = new SpriteBatch();
 		
-		tiled = new OrthogonalTiledMapRenderer(Resources.getInstance().map,1/32f);
-		camera.setToOrtho(false, 20, 12);
-		boyCam.setToOrtho(false, 20, 12);
+		tiled = new OrthogonalTiledMapRenderer(Resources.getInstance().map,1/40f);
+		camera.setToOrtho(false, 32, 20);
+		boyCam.setToOrtho(false, 32, 20);
 		tiled.setView(camera);
 		
 		camController = new OrthoCamController(boyCam);
@@ -147,12 +147,12 @@ public class GameScreen implements ApplicationListener {
 		
 		if(!boy.isdead) {
 			if(!boy.isSplit && splitBoy1.split_dist <= 0) {
-				boyRotation -= Gdx.graphics.getDeltaTime() * ROTATION_MULTIPLIER;
+				boyRotation -= delta * ROTATION_MULTIPLIER;
 				splitRotation = boyRotation;
 			} else {
-				splitRotation -= Gdx.graphics.getDeltaTime() * ROTATION_MULTIPLIER;
+				splitRotation -= delta * ROTATION_MULTIPLIER;
 			}
-			camera.translate(Gdx.graphics.getDeltaTime() * 2, 0);
+			camera.translate(delta * 2, 0);
 			camera.update();
 			tiled.setView(camera);
 		}
@@ -163,21 +163,21 @@ public class GameScreen implements ApplicationListener {
 			splitBoy2.normalBoy.setRotation(boyRotation);
 			
 			if(splitBoy1.split_dist <= splitBoy1.SPLIT_DISTANCE) {
-				splitBoy1.normalBoy.setPosition(splitBoy1.normalBoy.getX(),splitBoy1.normalBoy.getY() + Gdx.graphics.getDeltaTime());
-				splitBoy1.split_dist += Gdx.graphics.getDeltaTime();
+				splitBoy1.normalBoy.setPosition(splitBoy1.normalBoy.getX(),splitBoy1.normalBoy.getY() + delta);
+				splitBoy1.split_dist += delta;
 			}
 			if(splitBoy2.split_dist >= -splitBoy2.SPLIT_DISTANCE) {
-				splitBoy2.normalBoy.setPosition(splitBoy2.normalBoy.getX(),splitBoy2.normalBoy.getY() - Gdx.graphics.getDeltaTime());
-				splitBoy2.split_dist -= Gdx.graphics.getDeltaTime();
+				splitBoy2.normalBoy.setPosition(splitBoy2.normalBoy.getX(),splitBoy2.normalBoy.getY() - delta);
+				splitBoy2.split_dist -= delta;
 			}
 		} else {
 			if(splitBoy1.split_dist >= 0) {
-				splitBoy1.normalBoy.setPosition(splitBoy1.normalBoy.getX(),splitBoy1.normalBoy.getY() - Gdx.graphics.getDeltaTime());
-				splitBoy1.split_dist -= Gdx.graphics.getDeltaTime();
+				splitBoy1.normalBoy.setPosition(splitBoy1.normalBoy.getX(),splitBoy1.normalBoy.getY() - delta);
+				splitBoy1.split_dist -= delta;
 			}
 			if(splitBoy2.split_dist <= 0) {
-				splitBoy2.normalBoy.setPosition(splitBoy2.normalBoy.getX(),splitBoy2.normalBoy.getY() + Gdx.graphics.getDeltaTime());
-				splitBoy2.split_dist += Gdx.graphics.getDeltaTime();
+				splitBoy2.normalBoy.setPosition(splitBoy2.normalBoy.getX(),splitBoy2.normalBoy.getY() + delta);
+				splitBoy2.split_dist += delta;
 			}
 		}
 		
@@ -206,15 +206,15 @@ public class GameScreen implements ApplicationListener {
 				
 				if(boy.isBig && boy.sizeModifier < boy.MAX_GROWTH_MOD) {
 					readjustmentBig = false;
-					boy.sizeModifier += Gdx.graphics.getDeltaTime() / 20;
+					boy.sizeModifier += delta / 20;
 					boy.normalBoy.setBounds(boy.normalBoy.getX(), boy.normalBoy.getY(), boy.normalBoy.getWidth() * boy.sizeModifier, boy.normalBoy.getHeight() * boy.sizeModifier);
 					boy.normalBoy.setOrigin(boy.normalBoy.getOriginX() * boy.sizeModifier, boy.normalBoy.getOriginY() * boy.sizeModifier);
 					boy.boyBounds.set(boy.normalBoy.getBoundingRectangle());
 				} 
-				else if (!boy.isBig && boy.normalBoy.getWidth() >= 1.5001f) {
+				else if (!boy.isBig && boy.normalBoy.getWidth() >= boy.originalSize + 0.0001f) {
 
 					if(boy.sizeModifier > 1.0f) {
-						boy.sizeModifier -= Gdx.graphics.getDeltaTime() / 20;
+						boy.sizeModifier -= delta / 20;
 						readjustmentBig = false;
 					}
 					else {
@@ -232,15 +232,15 @@ public class GameScreen implements ApplicationListener {
 				
 				if(boy.isSmall && boy.sizeModifier < boy.MAX_SHRINK_MOD) {
 					readjustmentSmall = false;
-					boy.sizeModifier += Gdx.graphics.getDeltaTime() / 20;
+					boy.sizeModifier += delta / 20;
 					boy.normalBoy.setBounds(boy.normalBoy.getX(), boy.normalBoy.getY(), boy.normalBoy.getWidth() / boy.sizeModifier, boy.normalBoy.getHeight() / boy.sizeModifier);
 					boy.normalBoy.setOrigin(boy.normalBoy.getOriginX() / boy.sizeModifier, boy.normalBoy.getOriginY() / boy.sizeModifier);
 					boy.boyBounds.set(boy.normalBoy.getBoundingRectangle());
 					
 				} 
-				else if (!boy.isSmall && boy.normalBoy.getWidth() < 1.5f) {
+				else if (!boy.isSmall && boy.normalBoy.getWidth() < boy.originalSize) {
 					if(boy.sizeModifier > 1.0f) {
-						boy.sizeModifier -= Gdx.graphics.getDeltaTime() / 20;
+						boy.sizeModifier -= delta / 20;
 						readjustmentSmall = false;
 					}
 					else {
@@ -257,26 +257,26 @@ public class GameScreen implements ApplicationListener {
 				}
 				
 				if(readjustmentBig) {
-					float mod = boy.normalBoy.getWidth() / 1.5f;
-					mod -= Gdx.graphics.getDeltaTime() / 20;
+					float mod = boy.normalBoy.getWidth() / boy.originalSize;
+					mod -= delta / 20;
 
-					boy.normalBoy.setBounds(boy.normalBoy.getX(), boy.normalBoy.getY(), mod * 1.5f, mod * 1.5f);
+					boy.normalBoy.setBounds(boy.normalBoy.getX(), boy.normalBoy.getY(), mod * boy.originalSize, mod * boy.originalSize);
 					boy.normalBoy.setOrigin(boy.normalBoy.getWidth()/2, boy.normalBoy.getHeight()/2);
 					boy.boyBounds.set(boy.normalBoy.getBoundingRectangle());
 
-					if(boy.normalBoy.getWidth() <= 1.5f)
+					if(boy.normalBoy.getWidth() <= boy.originalSize)
 						readjustmentBig = false;
 				}
 				
 				if(readjustmentSmall) {
-					float mod = boy.normalBoy.getWidth() * 1.5f;
-					mod += Gdx.graphics.getDeltaTime() / 20;
+					float mod = boy.normalBoy.getWidth() * boy.originalSize;
+					mod += delta / 20;
 
-					boy.normalBoy.setBounds(boy.normalBoy.getX(), boy.normalBoy.getY(), mod / 1.5f, mod / 1.5f);
+					boy.normalBoy.setBounds(boy.normalBoy.getX(), boy.normalBoy.getY(), mod / boy.originalSize, mod / boy.originalSize);
 					boy.normalBoy.setOrigin(boy.normalBoy.getWidth()/2, boy.normalBoy.getHeight()/2);
 					boy.boyBounds.set(boy.normalBoy.getBoundingRectangle());
 
-					if(boy.normalBoy.getWidth() >= 1.5f)
+					if(boy.normalBoy.getWidth() >= boy.originalSize)
 						readjustmentSmall = false;
 				}
 				
@@ -388,7 +388,7 @@ public class GameScreen implements ApplicationListener {
 		}
 		
 		if(splitBoy1.isdead) {
-			stateTime += Gdx.graphics.getDeltaTime();
+			stateTime += delta;
 //			currentFrame = boy.getCurrentFrame(stateTime);
 			splitBoy1.getCurrentFrame(stateTime).getTexture().setFilter(TextureFilter.Linear, TextureFilter.Linear);
 			
@@ -423,7 +423,7 @@ public class GameScreen implements ApplicationListener {
 		}
 		
 		if(splitBoy2.isdead) {
-			stateTime += Gdx.graphics.getDeltaTime();
+			stateTime += delta;
 //			currentFrame = boy.getCurrentFrame(stateTime);
 			splitBoy2.getCurrentFrame(stateTime).getTexture().setFilter(TextureFilter.Linear, TextureFilter.Linear);
 			
@@ -462,7 +462,7 @@ public class GameScreen implements ApplicationListener {
 			Vector3 pos = boy.getPosition();
 			camera.project(pos);
 			
-			stateTime += Gdx.graphics.getDeltaTime();
+			stateTime += delta;
 //			currentFrame = boy.getCurrentFrame(stateTime);
 			boy.getCurrentFrame(stateTime).getTexture().setFilter(TextureFilter.Linear, TextureFilter.Linear);
 			
@@ -525,6 +525,16 @@ public class GameScreen implements ApplicationListener {
 			int toX = (int) (boy.boyBounds.x + boy.boyBounds.width + tiled.getViewBounds().x);
 			int toY = (int) (boy.boyBounds.y + boy.boyBounds.height);
 			
+//			Vector3 from = new Vector3(boy.boyBounds.x + tiled.getViewBounds().x,boy.boyBounds.y,0);
+//			Vector3 to = new Vector3(toX,toY,0);
+//			
+//							camera.project(from);
+//							camera.project(to);
+//
+//							r.begin(ShapeType.Line);
+//							r.setColor(1, 0, 0, 1);
+//							r.rect(from.x, from.y, 120,120);
+//							r.end();
 			
 			for(int x = fromX; x<=toX;x++) {
 				for(int y = fromY; y<=toY;y++) {
