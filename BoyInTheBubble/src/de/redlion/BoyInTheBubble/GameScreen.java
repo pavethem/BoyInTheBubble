@@ -43,8 +43,8 @@ public class GameScreen implements ApplicationListener {
 	private float stateTime;
 	
 	public static Boy boy;
-	public Boy splitBoy1;
-	public Boy splitBoy2;
+	public static Boy splitBoy1;
+	public static Boy splitBoy2;
 	
 	Sprite middle;
 	
@@ -63,13 +63,12 @@ public class GameScreen implements ApplicationListener {
 	OrthoCamController camController;
 	
 	Vector3 lastPosition;
-	Vector3 lastPositionBeforeDeath; 
+	public static Vector3 lastPositionBeforeDeath; 
 	static float boyRotation = 0;
 	float splitRotation = 0;
 	final float ROTATION_MULTIPLIER = 20;
 	
-	boolean readjustmentBig;
-	boolean readjustmentSmall;
+	CollisionDetector collisionDetector;
 	
 	ShapeRenderer r;
 	
@@ -126,8 +125,7 @@ public class GameScreen implements ApplicationListener {
 		boyRotation = 0;
 		splitRotation = 0;
 		
-		readjustmentBig = false;
-		readjustmentSmall = false;
+		collisionDetector = new CollisionDetector();
 	}
 
 	@Override
@@ -181,7 +179,7 @@ public class GameScreen implements ApplicationListener {
 			}
 		}
 		
-		collisionCheck();
+		collisionDetector.collisionCheck(boy, layer, tiled.getViewBounds());
 		
 		if(!boy.isdead) {
 			
@@ -462,136 +460,7 @@ public class GameScreen implements ApplicationListener {
 		
 	}
 
-	private void collisionCheck() {
-		
-		if(!boy.isSplit) {
-			int fromX = (int) (boy.boyBounds.x + tiled.getViewBounds().x);
-			int fromY = (int) (boy.boyBounds.y);
-			int toX = (int) (boy.boyBounds.x + boy.boyBounds.width + tiled.getViewBounds().x);
-			int toY = (int) (boy.boyBounds.y + boy.boyBounds.height);
-			
-//			Vector3 from = new Vector3(boy.boyBounds.x + tiled.getViewBounds().x,boy.boyBounds.y,0);
-//			Vector3 to = new Vector3(toX,toY,0);
-//			
-//							camera.project(from);
-//							camera.project(to);
-//
-//							r.begin(ShapeType.Line);
-//							r.setColor(1, 0, 0, 1);
-//							r.rect(from.x, from.y, 240,240);
-//							r.end();
-			
-			for(int x = fromX; x<=toX;x++) {
-				for(int y = fromY; y<=toY;y++) {
-					if(layer.getCell(x, y) != null)
-						boy.isdead = true;
-				}
-			}
-			
-			if(boy.hasTail) {
-				for(Vector3 p : boy.positions) {
-					fromX = (int) (-p.x + tiled.getViewBounds().x);
-					fromY = (int) (-p.y);
-					toX = (int) (-p.x - boy.getOrigin().x + boy.boyBounds.width + tiled.getViewBounds().x);
-					toY = (int) (-p.y - boy.getOrigin().y + boy.boyBounds.height);
-					
-					for(int x = fromX; x<=toX;x++) {
-						for(int y = fromY; y<=toY;y++) {
-							if(layer.getCell(x, y) != null)
-								boy.isdead = true;
-						}
-					}
-				}
-			}
-			
-		}
-		else {
-			
-			{
-				//check splitboy1
-				if(!splitBoy1.isdead) {
-					int fromX = (int) (splitBoy1.boyBounds.x + tiled.getViewBounds().x);
-					int fromY = (int) (splitBoy1.boyBounds.y);
-					int toX = (int) (splitBoy1.boyBounds.x + splitBoy1.boyBounds.width + tiled.getViewBounds().x);
-					int toY = (int) (splitBoy1.boyBounds.y + splitBoy1.boyBounds.height);
-					
-					for(int x = fromX; x<=toX;x++) {
-						for(int y = fromY; y<=toY;y++) {
-							if(layer.getCell(x, y) != null) {
-								splitBoy1.isdead = true;
-								lastPositionBeforeDeath = splitBoy1.getPosition();
-							}
-						}
-					}
-				}
-			}
-			{
-				//check splitboy2
-				if(!splitBoy2.isdead) {
-					int fromX = (int) (splitBoy2.boyBounds.x + tiled.getViewBounds().x);
-					int fromY = (int) (splitBoy2.boyBounds.y);
-					int toX = (int) (splitBoy2.boyBounds.x + splitBoy2.boyBounds.width + tiled.getViewBounds().x);
-					int toY = (int) (splitBoy2.boyBounds.y + splitBoy2.boyBounds.height);
-					
-	//				Vector3 from = new Vector3(splitBoy2.split_dist, splitBoy2.split_dist,0);
-	//				Vector3 to = new Vector3(splitBoy2.split_dist, splitBoy2.split_dist,0);
-	//				
-	//				from.rotate(Vector3.Z, boyRotation);
-	//				to.rotate(Vector3.Z, boyRotation);
-	//				
-	//				from.add(fromX, fromY, 0);
-	//				to.add(toX , toY , 0);
-	//				
-	//				fromX = (int) from.x;
-	//				fromY = (int) from.y;
-	//				toX = (int) to.x;
-	//				toY = (int) to.y;
-					
-	//				camera.project(from);
-	//				camera.project(to);
-	//				r.begin(ShapeType.Line);
-	//				r.setColor(1, 0, 0, 1);
-	//				r.rect(from.x, from.y, to.x - from.x, to.y - from.y);
-	//				r.line(from.x, from.y, to.x, to.y);
-	//				r.end();
-					
-			//		Gdx.app.log("", ""+ (int) newPos.x  + " " + (int) (newPos.y) );
-			//		Gdx.app.log("", layer.getCell((int) newPos.x , (int)(newPos.y)) + "");
-			//		Gdx.app.log("", "" + (int) boy.x + " " + (int)boy.y + " " + (int)boy.width + " " + (int)boy.height);
-			//		Gdx.app.log("", "" + fromX + " " + fromY + " " + toX + " " + toY + " " + middleX + " " + middleY);
-					
-			//		Gdx.app.log("", tiled.getViewBounds().toString());
-					
-					for(int x = fromX; x<=toX;x++) {
-						for(int y = fromY; y<=toY;y++) {
-							if(layer.getCell(x, y) != null) {
-								splitBoy2.isdead = true;
-								lastPositionBeforeDeath = splitBoy2.getPosition();
-							}
-						}
-					}
-				}
-			}
 
-		}
-		
-		if(boy.isSplit && splitBoy1.split_dist <= splitBoy1.SPLIT_DISTANCE) {
-			boy.isdead = false;
-			splitBoy1.isdead = false;
-			splitBoy2.isdead = false;
-		}
-		if(!boy.isSplit && splitBoy1.split_dist > 0) {
-			boy.isdead = false;
-			splitBoy1.isdead = false;
-			splitBoy2.isdead = false;
-		}
-		
-		if(splitBoy1.isdead && splitBoy2.isdead)
-			boy.isdead = true;
-		
-		boy.isdead = false;
-		
-	}
 
 	@Override
 	public void resize(int width, int height) {
