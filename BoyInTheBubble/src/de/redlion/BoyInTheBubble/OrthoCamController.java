@@ -40,18 +40,7 @@ public class OrthoCamController extends InputAdapter {
 		
 		if(touched) {
 			
-			float sizemod = 1.0f;
-			if(GameScreen.boy.isBig)
-				sizemod = (GameScreen.boy.normalBoy.getWidth() / 1.5f);
-			else if(GameScreen.boy.isSmall)
-				sizemod = (GameScreen.boy.normalBoy.getWidth() / 1.5f);
-			
-			float size =  (Resources.getInstance().boyTextures.getRegions().get(0).originalWidth);
-			
-//			size += 0.5f * size;
-			size *= sizemod;
-			
-			System.out.println(GameScreen.boy.sizeModifier);
+			float size =  GameScreen.boy.size;
 			
 			int correctedX = (int) (x - size/2 - screenOffsetX);
 			int correctedY = (int) (y + size/2 + screenOffsetY);
@@ -63,9 +52,6 @@ public class OrthoCamController extends InputAdapter {
 			camera.unproject(newPos);
 			
 			normalBoy = GameScreen.boy.normalBoy.getBoundingRectangle();
-				
-//			newPos.x -= GameScreen.boy.getOrigin().x;
-//			newPos.y += GameScreen.boy.getOrigin().y;
 			
 			GameScreen.boy.normalBoy.setPosition(newPos.x , newPos.y );
 			last.set(x,y);
@@ -95,35 +81,24 @@ public class OrthoCamController extends InputAdapter {
 		
 		camera.project(pos);
 		
-		float w = Resources.getInstance().boyTextures.getRegions().get(0).originalWidth;
-		if(GameScreen.boy.isBig)
-			w *= 2;
-		else if(GameScreen.boy.isSmall)
-			w /= 2;
-		
-//		w += 0.5f * w;
+		float w = GameScreen.boy.size;
 
-		float h = Resources.getInstance().boyTextures.getRegions().get(0).originalHeight;
-		if(GameScreen.boy.isBig)
-			h *= 2;
-		else if(GameScreen.boy.isSmall)
-			h /= 2;
-//		h += 0.5f * h;
+		float h = GameScreen.boy.size;
 		
 		Rectangle box = new Rectangle(pos.x, pos.y, w,h);
 		
 		if(box.contains(x,y) && !GameScreen.boy.isdead) {
 			touched = true;
 			
-			float sizemod = 1.0f;
-			if(GameScreen.boy.isBig)
-				sizemod = 1 + GameScreen.boy.normalBoy.getWidth() - 1.5f;
-			else if(GameScreen.boy.isSmall)
-				sizemod = 1.5f - GameScreen.boy.normalBoy.getWidth();
+//			float sizemod = 1.0f;
+//			if(GameScreen.boy.isBig)
+//				sizemod = 1 + GameScreen.boy.normalBoy.getWidth() - 1.5f;
+//			else if(GameScreen.boy.isSmall)
+//				sizemod = 1.5f - GameScreen.boy.normalBoy.getWidth();
 			
-			float centerX = normalBoy.getX() + (normalBoy.getWidth() * GameScreen.boy.sizeModifier) / 2;
+			float centerX = normalBoy.getX() + normalBoy.getWidth() / 2;
 			float screenCenterX = box.x + (w) / 2;
-			float centerY = normalBoy.getY() - (normalBoy.getHeight() * GameScreen.boy.sizeModifier)/2;
+			float centerY = normalBoy.getY() - normalBoy.getHeight()/2;
 			float screenCenterY = box.y + (h) / 2;
 			
 			if(centerX > newPos.x) {

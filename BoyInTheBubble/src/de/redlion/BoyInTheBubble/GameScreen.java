@@ -187,9 +187,30 @@ public class GameScreen implements ApplicationListener {
 			
 			Vector3 position = boy.getCorrectedPosition();
 			
+			if (boy.size > boy.targetSize) {
+				boy.size -= Gdx.graphics.getDeltaTime();
+				if(boy.isSmall)
+					boy.normalBoy.setSize(((float)boy.size/boy.targetSize)*boy.smallSize, ((float)boy.size/boy.targetSize)*boy.smallSize);
+				else
+					boy.normalBoy.setSize(((float)boy.size/boy.targetSize)*boy.originalSize, ((float)boy.size/boy.targetSize)*boy.originalSize);
+				
+				boy.normalBoy.setOrigin(boy.normalBoy.getWidth()/2,boy.normalBoy.getHeight()/2 );
+			}
+			else if(boy.size < boy.targetSize) {
+				boy.size += Gdx.graphics.getDeltaTime() * 100;
+				if(boy.isBig)
+					boy.normalBoy.setSize(((float)boy.size/boy.targetSize)*boy.bigSize, ((float)boy.size/boy.targetSize)*boy.bigSize);
+				else
+					boy.normalBoy.setSize(((float)boy.size/boy.targetSize)*boy.originalSize, ((float)boy.size/boy.targetSize)*boy.originalSize);
+				
+				boy.normalBoy.setOrigin(boy.normalBoy.getWidth()/2,boy.normalBoy.getHeight()/2 );
+			}
+			
 			if(!boy.isSplit && splitBoy1.split_dist <= 0) {
 				model.idt();
 				temp.idt();
+//				temp.setToScaling(boy.targetSize/boy.size, boy.targetSize/boy.size, 0);
+//				model.mul(temp);
 				temp.setToTranslation(-position.x,-position.y,0);
 				model.mul(temp);
 				temp.setToRotation(Vector3.Z, boyRotation);
@@ -202,82 +223,6 @@ public class GameScreen implements ApplicationListener {
 						boy.updateTail(boy.getCorrectedPosition());
 						lastPosition.set(boy.getCorrectedPosition());
 					}
-				}
-				
-				if(boy.isBig && boy.sizeModifier < boy.MAX_GROWTH_MOD) {
-					readjustmentBig = false;
-					boy.sizeModifier += delta / 20;
-					boy.normalBoy.setBounds(boy.normalBoy.getX(), boy.normalBoy.getY(), boy.normalBoy.getWidth() * boy.sizeModifier, boy.normalBoy.getHeight() * boy.sizeModifier);
-					boy.normalBoy.setOrigin(boy.normalBoy.getOriginX() * boy.sizeModifier, boy.normalBoy.getOriginY() * boy.sizeModifier);
-					boy.boyBounds.set(boy.normalBoy.getBoundingRectangle());
-				} 
-				else if (!boy.isBig && boy.normalBoy.getWidth() >= boy.originalSize + 0.0001f) {
-
-					if(boy.sizeModifier > 1.0f) {
-						boy.sizeModifier -= delta / 20;
-						readjustmentBig = false;
-					}
-					else {
-						boy.sizeModifier = 1.0f;
-						readjustmentBig = true;
-					}
-					
-					
-					boy.normalBoy.setBounds(boy.normalBoy.getX(), boy.normalBoy.getY(), boy.normalBoy.getWidth() / boy.sizeModifier, boy.normalBoy.getHeight() / boy.sizeModifier);
-					boy.normalBoy.setOrigin(boy.normalBoy.getOriginX() / boy.sizeModifier, boy.normalBoy.getOriginY() / boy.sizeModifier);
-					boy.boyBounds.set(boy.normalBoy.getBoundingRectangle());
-					
-					
-				}
-				
-				if(boy.isSmall && boy.sizeModifier < boy.MAX_SHRINK_MOD) {
-					readjustmentSmall = false;
-					boy.sizeModifier += delta / 20;
-					boy.normalBoy.setBounds(boy.normalBoy.getX(), boy.normalBoy.getY(), boy.normalBoy.getWidth() / boy.sizeModifier, boy.normalBoy.getHeight() / boy.sizeModifier);
-					boy.normalBoy.setOrigin(boy.normalBoy.getOriginX() / boy.sizeModifier, boy.normalBoy.getOriginY() / boy.sizeModifier);
-					boy.boyBounds.set(boy.normalBoy.getBoundingRectangle());
-					
-				} 
-				else if (!boy.isSmall && boy.normalBoy.getWidth() < boy.originalSize) {
-					if(boy.sizeModifier > 1.0f) {
-						boy.sizeModifier -= delta / 20;
-						readjustmentSmall = false;
-					}
-					else {
-						boy.sizeModifier = 1.0f;
-						readjustmentSmall = true;
-					}
-					
-					
-					boy.normalBoy.setBounds(boy.normalBoy.getX(), boy.normalBoy.getY(), boy.normalBoy.getWidth() * boy.sizeModifier, boy.normalBoy.getHeight() * boy.sizeModifier);
-					boy.normalBoy.setOrigin(boy.normalBoy.getOriginX() * boy.sizeModifier, boy.normalBoy.getOriginY() * boy.sizeModifier);
-					boy.boyBounds.set(boy.normalBoy.getBoundingRectangle());
-					
-					
-				}
-				
-				if(readjustmentBig) {
-					float mod = boy.normalBoy.getWidth() / boy.originalSize;
-					mod -= delta / 20;
-
-					boy.normalBoy.setBounds(boy.normalBoy.getX(), boy.normalBoy.getY(), mod * boy.originalSize, mod * boy.originalSize);
-					boy.normalBoy.setOrigin(boy.normalBoy.getWidth()/2, boy.normalBoy.getHeight()/2);
-					boy.boyBounds.set(boy.normalBoy.getBoundingRectangle());
-
-					if(boy.normalBoy.getWidth() <= boy.originalSize)
-						readjustmentBig = false;
-				}
-				
-				if(readjustmentSmall) {
-					float mod = boy.normalBoy.getWidth() * boy.originalSize;
-					mod += delta / 20;
-
-					boy.normalBoy.setBounds(boy.normalBoy.getX(), boy.normalBoy.getY(), mod / boy.originalSize, mod / boy.originalSize);
-					boy.normalBoy.setOrigin(boy.normalBoy.getWidth()/2, boy.normalBoy.getHeight()/2);
-					boy.boyBounds.set(boy.normalBoy.getBoundingRectangle());
-
-					if(boy.normalBoy.getWidth() >= boy.originalSize)
-						readjustmentSmall = false;
 				}
 				
 				batch.setProjectionMatrix(boyCam.combined);
@@ -533,7 +478,7 @@ public class GameScreen implements ApplicationListener {
 //
 //							r.begin(ShapeType.Line);
 //							r.setColor(1, 0, 0, 1);
-//							r.rect(from.x, from.y, 120,120);
+//							r.rect(from.x, from.y, 240,240);
 //							r.end();
 			
 			for(int x = fromX; x<=toX;x++) {

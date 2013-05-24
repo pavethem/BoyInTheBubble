@@ -24,14 +24,17 @@ public class Boy {
 	public boolean isBig;
 	public boolean isSmall;
 	public float split_dist;
-	public float sizeModifier;
+//	public float sizeModifier;
 	
 	public float originalSize = 3f; // macht 120px
 	public int size = 120;
+	public int targetSize = 120;
+	public float smallSize = 1.5f;
+	public float bigSize = 5f;
 	
 	public final float SPLIT_DISTANCE = 1.4f;
-	public final float MAX_GROWTH_MOD = 1.03f;
-	public final float MAX_SHRINK_MOD = 1.03f;
+//	public final float MAX_GROWTH_MOD = 1.03f;
+//	public final float MAX_SHRINK_MOD = 1.03f;
 	
 	public boolean hasTail = false;
 	public final int MAX_POSITIONS = 10;
@@ -55,7 +58,7 @@ public class Boy {
 		boyBounds = normalBoy.getBoundingRectangle();
 		
 		split_dist = 0;
-		sizeModifier = 1.0f;
+//		sizeModifier = 1.0f;
 		
 		isdead = false;
 		isfinished = false;
@@ -104,7 +107,10 @@ public class Boy {
 		isSmall = false;
 		
 		if(isBig)
-			normalBoy.setSize(originalSize, originalSize);
+			targetSize = 200;
+		else
+			targetSize = 120;
+
 		return isBig;
 	}
 	
@@ -112,8 +118,12 @@ public class Boy {
 		isSmall = !isSmall;
 		isBig = false;
 		
-		if(isSmall)
-			normalBoy.setSize(originalSize, originalSize);
+		if(isSmall) {
+			targetSize = 60;
+		}
+		else {
+			targetSize = 120;
+		}
 		
 		return isSmall;
 	}
