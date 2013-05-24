@@ -14,9 +14,9 @@ public class CollisionDetector {
 
 	public void collisionCheck(Boy boy, TiledMapTileLayer layer, Rectangle viewBounds) {
 		
-		for(int y = (int) spawner.area.y; y<spawner.area.getHeight();y++) {
-			if(layer.getCell((int) spawner.area.x, y) != null)
-				System.out.println("das");
+		for(int y = 0; y<spawner.area.getHeight();y++) {
+			if(layer.getCell((int) (viewBounds.x + viewBounds.width), y) != null)
+				System.out.println(y);
 		}
 		
 		if(!boy.isSplit) {

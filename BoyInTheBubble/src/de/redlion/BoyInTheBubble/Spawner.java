@@ -8,7 +8,7 @@ public class Spawner {
 	
 	public Spawner(int width, int height) {
 		
-		area = new Rectangle(width, 0, 10, height);
+		area = new Rectangle(width, 0, 1, height);
 		
 	}
 	
