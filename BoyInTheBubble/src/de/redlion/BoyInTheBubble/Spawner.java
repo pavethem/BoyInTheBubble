@@ -1,5 +1,7 @@
 package de.redlion.BoyInTheBubble;
 
+import java.util.ArrayList;
+
 import com.badlogic.gdx.maps.MapLayer;
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
@@ -9,31 +11,44 @@ public class Spawner {
 	
 	public MapLayer layer;
 	
-	private Rectangle[] rectangles;
+	private ArrayList<Rectangle> rectangles;
+	private final float EPSILON = 0.1f;
 	
 	public Spawner(MapLayer layer) {
 		
 		this.layer = layer;
 		
-		rectangles = new Rectangle[layer.getObjects().getCount()];
-		
-		int i=0;
+		rectangles = new ArrayList<Rectangle>(layer.getObjects().getCount());
+
 		for(MapObject o : layer.getObjects()) {
 			if(o instanceof RectangleMapObject) {
 				RectangleMapObject ro = (RectangleMapObject) o;
-				rectangles[i] = ro.getRectangle();
-				System.out.println(ro.getRectangle().y);
-				i++;
+				Rectangle temp = ro.getRectangle();
+				
+				temp.x *= GameScreen.tiled.getUnitScale();
+				
+				//fix y cause libgdx screws it up
+				
+				temp.y = 800 - temp.height - temp.y;
+				
+				
+				temp.y *= GameScreen.tiled.getUnitScale();
+				
+				rectangles.add(temp);
 			}
 		}
 	}
 	
 	public void update(float x) {
 		
+//		System.out.println(x);
+		
 		for(Rectangle r : rectangles) {
-//			if(r.x == x) {
-//				System.out.println(r.y);
-//			}
+			if(Math.abs(r.x - x) < EPSILON) {
+				System.out.println(":)");
+				rectangles.remove(r);
+				break;
+			}
 		}
 		
 	}
