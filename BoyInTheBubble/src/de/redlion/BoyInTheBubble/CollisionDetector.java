@@ -1,5 +1,6 @@
 package de.redlion.BoyInTheBubble;
 
+import com.badlogic.gdx.maps.MapLayers;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
@@ -7,18 +8,17 @@ import com.badlogic.gdx.math.Vector3;
 public class CollisionDetector {
 	
 	Spawner spawner;
+	int lastRow;
 	
-	public CollisionDetector(TiledMapTileLayer layer) {
-		spawner = new Spawner(layer.getWidth(),layer.getHeight());
+	public CollisionDetector(MapLayers layers) {
+		spawner = new Spawner(layers.getLayer("movables"));
+		lastRow = -1;
 	}
 
 	public void collisionCheck(Boy boy, TiledMapTileLayer layer, Rectangle viewBounds) {
 		
-		for(int y = 0; y<spawner.area.getHeight();y++) {
-			if(layer.getCell((int) (viewBounds.x + viewBounds.width), y) != null)
-				System.out.println(y);
-		}
-		
+		spawner.update(viewBounds.x+viewBounds.getWidth());
+
 		if(!boy.isSplit) {
 			int fromX = (int) (boy.boyBounds.x + viewBounds.x);
 			int fromY = (int) (boy.boyBounds.y);

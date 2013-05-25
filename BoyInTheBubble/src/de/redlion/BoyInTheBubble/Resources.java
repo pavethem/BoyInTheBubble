@@ -33,7 +33,7 @@ public class Resources {
 		boyTextures = new TextureAtlas(Gdx.files.internal("data/boy.pack"));
 		middle = new Texture(Gdx.files.internal("data/middle.png"));
 //		boyTex = boyTextures.getRegions().get(0).getTexture();
-		map = new TmxMapLoader().load(Gdx.files.internal("data/test.tmx").toString());
+		map = new TmxMapLoader().load(Gdx.files.internal("data/test.tmx").toString(),true);
 	}
 
 	public void dispose() {

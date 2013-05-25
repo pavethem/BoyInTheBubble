@@ -74,7 +74,7 @@ public class GameScreen implements ApplicationListener {
 		camera.setToOrtho(false, 32, 20);
 		boyCam.setToOrtho(false, 32, 20);
 		tiled.setView(camera);
-		
+
 		camController = new OrthoCamController(boyCam);
 		Gdx.input.setInputProcessor(camController);
 		
@@ -93,7 +93,7 @@ public class GameScreen implements ApplicationListener {
 		fadeBatch = new SpriteBatch();
 		fadeBatch.getProjectionMatrix().setToOrtho2D(0, 0, 1, 1);
 		
-		layer = (TiledMapTileLayer) Resources.getInstance().map.getLayers().getLayer(0);
+		layer = (TiledMapTileLayer) tiled.getMap().getLayers().getLayer(0);
 		
 		tiled.getMap().getTileSets().getTileSet(0).getTile(1).getTextureRegion().getTexture().setFilter(TextureFilter.Linear, TextureFilter.Linear);
 		
@@ -107,7 +107,8 @@ public class GameScreen implements ApplicationListener {
 		boyRotation = 0;
 		splitRotation = 0;
 		
-		collisionDetector = new CollisionDetector(layer);
+		collisionDetector = new CollisionDetector(tiled.getMap().getLayers());
+		
 	}
 
 	@Override
