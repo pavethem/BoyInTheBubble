@@ -11,7 +11,7 @@ public class CollisionDetector {
 	int lastRow;
 	
 	public CollisionDetector(MapLayers layers) {
-		spawner = new Spawner(layers.getLayer("movables"));
+		spawner = new Spawner(layers.get("movables"));
 		lastRow = -1;
 	}
 

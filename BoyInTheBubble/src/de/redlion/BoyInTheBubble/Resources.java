@@ -5,7 +5,9 @@ import com.badlogic.gdx.assets.AssetDescriptor;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.resolvers.ExternalFileHandleResolver;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.maps.tiled.TideMapLoader.Parameters;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 
@@ -33,7 +35,14 @@ public class Resources {
 		boyTextures = new TextureAtlas(Gdx.files.internal("data/boy.pack"));
 		middle = new Texture(Gdx.files.internal("data/middle.png"));
 //		boyTex = boyTextures.getRegions().get(0).getTexture();
-		map = new TmxMapLoader().load(Gdx.files.internal("data/test.tmx").toString(),true);
+		Parameters das = new Parameters();
+		TmxMapLoader.Parameters p = new TmxMapLoader.Parameters();
+		p.generateMipMaps = true;
+		p.yUp = true;
+		p.textureMagFilter = TextureFilter.Linear;
+		p.textureMinFilter = TextureFilter.Linear;
+
+		map = new TmxMapLoader().load(Gdx.files.internal("data/test.tmx").toString(),p);
 	}
 
 	public void dispose() {

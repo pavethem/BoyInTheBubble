@@ -93,9 +93,9 @@ public class GameScreen implements ApplicationListener {
 		fadeBatch = new SpriteBatch();
 		fadeBatch.getProjectionMatrix().setToOrtho2D(0, 0, 1, 1);
 		
-		layer = (TiledMapTileLayer) tiled.getMap().getLayers().getLayer(0);
+		layer = (TiledMapTileLayer) tiled.getMap().getLayers().get(0);
 		
-		tiled.getMap().getTileSets().getTileSet(0).getTile(1).getTextureRegion().getTexture().setFilter(TextureFilter.Linear, TextureFilter.Linear);
+//		tiled.getMap().getTileSets().getTileSet(0).getTile(1).getTextureRegion().getTexture().setFilter(TextureFilter.Linear, TextureFilter.Linear);
 		
 		stateTime = 0;
 		finished = false;
@@ -106,7 +106,6 @@ public class GameScreen implements ApplicationListener {
 		lastPositionBeforeDeath = new Vector3(0, 0, 0);
 		boyRotation = 0;
 		splitRotation = 0;
-		
 		collisionDetector = new CollisionDetector(tiled.getMap().getLayers());
 		
 	}

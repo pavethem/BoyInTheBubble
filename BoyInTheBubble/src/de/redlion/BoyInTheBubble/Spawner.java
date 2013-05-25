@@ -15,7 +15,7 @@ public class Spawner {
 		
 		this.layer = layer;
 		
-		rectangles = new Rectangle[layer.getObjects().getNumObjects()];
+		rectangles = new Rectangle[layer.getObjects().getCount()];
 		
 		int i=0;
 		for(MapObject o : layer.getObjects()) {
@@ -26,7 +26,6 @@ public class Spawner {
 				i++;
 			}
 		}
-		
 	}
 	
 	public void update(float x) {

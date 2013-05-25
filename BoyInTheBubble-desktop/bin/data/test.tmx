@@ -38,6 +38,6 @@
   </data>
  </layer>
  <objectgroup name="movables" width="150" height="20">
-  <object name="obj" x="1681" y="392" width="28" height="71"/>
+  <object name="obj" x="1682" y="368" width="28" height="71"/>
  </objectgroup>
 </map>
