@@ -6,19 +6,38 @@ import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
+import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
+import com.badlogic.gdx.physics.box2d.ChainShape;
+import com.badlogic.gdx.physics.box2d.CircleShape;
+import com.badlogic.gdx.physics.box2d.Contact;
+import com.badlogic.gdx.physics.box2d.ContactListener;
+import com.badlogic.gdx.physics.box2d.Filter;
+import com.badlogic.gdx.physics.box2d.Fixture;
+import com.badlogic.gdx.physics.box2d.FixtureDef;
+import com.badlogic.gdx.physics.box2d.MassData;
+import com.badlogic.gdx.physics.box2d.PolygonShape;
+import com.badlogic.gdx.physics.box2d.World;
 
 public class GameScreen implements ApplicationListener {
 	private OrthographicCamera camera;
 	private OrthographicCamera boyCam;
 	static OrthogonalTiledMapRenderer tiled;
 	private SpriteBatch batch;
+
+	private SpriteBatch fontBatch;
+	BitmapFont font;
 	
 	private TiledMapTileLayer layer;
 
@@ -52,6 +71,12 @@ public class GameScreen implements ApplicationListener {
 	
 	CollisionDetector collisionDetector;
 	
+	public static World world;
+	static final float WORLD_TO_BOX = 0.01f;
+	static final float BOX_TO_WORLD = 100f;
+	
+	Box2DDebugRenderer debugRenderer;
+	
 	ShapeRenderer r;
 	
 	@Override
@@ -63,12 +88,18 @@ public class GameScreen implements ApplicationListener {
 		float w = Gdx.graphics.getWidth();
 		float h = Gdx.graphics.getHeight();
 		
+		font = new BitmapFont();
+		font.setColor(1, 1, 0, 1);
+		font.setScale(2f);
+		
 		temp = new Matrix4();
 		model = new Matrix4();
 		
 		camera = new OrthographicCamera(1, h/w);
 		boyCam = new OrthographicCamera(1, h/w);
 		batch = new SpriteBatch();
+		
+		fontBatch = new SpriteBatch();
 		
 		tiled = new OrthogonalTiledMapRenderer(Resources.getInstance().map,1/40f);
 		camera.setToOrtho(false, 32, 20);
@@ -78,9 +109,27 @@ public class GameScreen implements ApplicationListener {
 		camController = new OrthoCamController(boyCam);
 		Gdx.input.setInputProcessor(camController);
 		
+		world = new World(new Vector2(0,0), true);
+		debugRenderer = new Box2DDebugRenderer();
+		
+		BodyDef walls = new BodyDef();
+		walls.type = BodyType.StaticBody;
+		walls.position.set(0,0);
+		
+		Body wallBody = world.createBody(walls);
+		
+		ChainShape borders = new ChainShape();
+		Vector2[] vertices = {new Vector2(0,0),new Vector2(camera.viewportWidth,0),new Vector2(camera.viewportWidth,camera.viewportHeight),new Vector2(0,camera.viewportHeight)};
+		borders.createLoop(vertices);
+		borders.setRadius(0f);
+		wallBody.createFixture(borders,100f).setFriction(0);
+		borders.dispose();
+		
 		boy = new Boy(camera.viewportWidth, camera.viewportHeight);
-		splitBoy1 = new Boy(camera.viewportWidth, camera.viewportHeight);
-		splitBoy2 = new Boy(camera.viewportWidth, camera.viewportHeight);
+		splitBoy1 = new Boy(camera.viewportWidth, camera.viewportHeight,false);
+		splitBoy2 = new Boy(camera.viewportWidth, camera.viewportHeight,false);
+		
+		world.setContactListener(boy.bubble.contactListener);
 		
 		middle = new Sprite(Resources.getInstance().middle);
 		middle.getTexture().setFilter(TextureFilter.Linear, TextureFilter.Linear);
@@ -113,6 +162,7 @@ public class GameScreen implements ApplicationListener {
 	@Override
 	public void dispose() {
 		batch.dispose();
+		fontBatch.dispose();
 		boy.dispose();
 		tiled.dispose();
 		fadeBatch.dispose();
@@ -123,46 +173,57 @@ public class GameScreen implements ApplicationListener {
 		Gdx.gl.glClearColor(1, 1, 1, 1);
 		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
 		
-		delta = Math.min(0.1f, Gdx.graphics.getDeltaTime());		
+		fontBatch.begin();
+		font.draw(fontBatch, Gdx.graphics.getFramesPerSecond() + "", 20, 30);
+		fontBatch.end();
 		
-		if(!boy.isdead) {
-			if(!boy.isSplit && splitBoy1.split_dist <= 0) {
-				boyRotation -= delta * ROTATION_MULTIPLIER;
-				splitRotation = boyRotation;
-			} else {
-				splitRotation -= delta * ROTATION_MULTIPLIER;
-			}
-			camera.translate(delta * 2, 0);
-			camera.update();
-			tiled.setView(camera);
+		delta = Math.min(0.1f, Gdx.graphics.getDeltaTime());	
+		world.step(delta, 60, 20);
+		debugRenderer.render(world, camera.combined);
+		
+		for(Contact c : world.getContactList()) {
+			c.getFixtureB().setDensity(1000);
 		}
-		tiled.render();
-		
-		if(boy.isSplit) {
-			splitBoy1.normalBoy.setRotation(boyRotation);
-			splitBoy2.normalBoy.setRotation(boyRotation);
-			
-			if(splitBoy1.split_dist <= splitBoy1.SPLIT_DISTANCE) {
-				splitBoy1.normalBoy.setPosition(splitBoy1.normalBoy.getX(),splitBoy1.normalBoy.getY() + delta);
-				splitBoy1.split_dist += delta;
-			}
-			if(splitBoy2.split_dist >= -splitBoy2.SPLIT_DISTANCE) {
-				splitBoy2.normalBoy.setPosition(splitBoy2.normalBoy.getX(),splitBoy2.normalBoy.getY() - delta);
-				splitBoy2.split_dist -= delta;
-			}
-		} else {
-			if(splitBoy1.split_dist >= 0) {
-				splitBoy1.normalBoy.setPosition(splitBoy1.normalBoy.getX(),splitBoy1.normalBoy.getY() - delta);
-				splitBoy1.split_dist -= delta;
-			}
-			if(splitBoy2.split_dist <= 0) {
-				splitBoy2.normalBoy.setPosition(splitBoy2.normalBoy.getX(),splitBoy2.normalBoy.getY() + delta);
-				splitBoy2.split_dist += delta;
-			}
-		}
-		
-		collisionDetector.collisionCheck(boy, layer, tiled.getViewBounds());
-		
+
+//		
+//		if(!boy.isdead) {
+//			if(!boy.isSplit && splitBoy1.split_dist <= 0) {
+//				boyRotation -= delta * ROTATION_MULTIPLIER;
+//				splitRotation = boyRotation;
+//			} else {
+//				splitRotation -= delta * ROTATION_MULTIPLIER;
+//			}
+////			camera.translate(delta * 2, 0);
+////			camera.update();
+//			tiled.setView(camera);
+//		}
+////		tiled.render();
+//		
+//		if(boy.isSplit) {
+//			splitBoy1.normalBoy.setRotation(boyRotation);
+//			splitBoy2.normalBoy.setRotation(boyRotation);
+//			
+//			if(splitBoy1.split_dist <= splitBoy1.SPLIT_DISTANCE) {
+//				splitBoy1.normalBoy.setPosition(splitBoy1.normalBoy.getX(),splitBoy1.normalBoy.getY() + delta);
+//				splitBoy1.split_dist += delta;
+//			}
+//			if(splitBoy2.split_dist >= -splitBoy2.SPLIT_DISTANCE) {
+//				splitBoy2.normalBoy.setPosition(splitBoy2.normalBoy.getX(),splitBoy2.normalBoy.getY() - delta);
+//				splitBoy2.split_dist -= delta;
+//			}
+//		} else {
+//			if(splitBoy1.split_dist >= 0) {
+//				splitBoy1.normalBoy.setPosition(splitBoy1.normalBoy.getX(),splitBoy1.normalBoy.getY() - delta);
+//				splitBoy1.split_dist -= delta;
+//			}
+//			if(splitBoy2.split_dist <= 0) {
+//				splitBoy2.normalBoy.setPosition(splitBoy2.normalBoy.getX(),splitBoy2.normalBoy.getY() + delta);
+//				splitBoy2.split_dist += delta;
+//			}
+//		}
+//		
+//		collisionDetector.collisionCheck(boy, layer, tiled.getViewBounds());
+//		
 		if(!boy.isdead) {
 			
 			Vector3 position = boy.getCorrectedPosition();
@@ -311,135 +372,135 @@ public class GameScreen implements ApplicationListener {
 //				r.end();
 			}
 		}
-		
-		if(splitBoy1.isdead) {
-			stateTime += delta;
-//			currentFrame = boy.getCurrentFrame(stateTime);
-			splitBoy1.getCurrentFrame(stateTime).getTexture().setFilter(TextureFilter.Linear, TextureFilter.Linear);
-			
-			Sprite deadBoy = new Sprite(splitBoy1.getCurrentFrame(stateTime));
-			
-			deadBoy.setSize(splitBoy1.boyBounds.width, splitBoy1.boyBounds.height);
-			deadBoy.setPosition(lastPositionBeforeDeath.x,splitBoy1.getPosition().y);
-			deadBoy.setOrigin(splitBoy1.getOrigin().x, splitBoy1.getOrigin().y);
-			deadBoy.setRotation(boyRotation);
-			model.idt();
-			
-			batch.begin();
-			batch.setTransformMatrix(model);
-			deadBoy.draw(batch);
-			batch.end();
-			
-			if(splitBoy1.isfinished) {
-				float y = splitBoy1.getPosition().y;
-				y -= 0.25f;
-				
-				deadBoy.setRotation(boyRotation);
-				model.idt();
-				splitBoy1.normalBoy.setPosition(boy.getPosition().x, y);
-				
-				if(splitBoy1.getPosition().y < 0) {
-					splitBoy1.dispose();
-					
-					if(splitBoy2.isdead)
-						finished = true;
-				}
-			}
-		}
-		
-		if(splitBoy2.isdead) {
-			stateTime += delta;
-//			currentFrame = boy.getCurrentFrame(stateTime);
-			splitBoy2.getCurrentFrame(stateTime).getTexture().setFilter(TextureFilter.Linear, TextureFilter.Linear);
-			
-			Sprite deadBoy = new Sprite(splitBoy2.getCurrentFrame(stateTime));
-			
-			deadBoy.setSize(splitBoy2.boyBounds.width, splitBoy2.boyBounds.height);
-			deadBoy.setPosition(lastPositionBeforeDeath.x,splitBoy2.getPosition().y);
-			deadBoy.setOrigin(splitBoy2.getOrigin().x, splitBoy2.getOrigin().y);
-			deadBoy.setRotation(boyRotation);
-			model.idt();
-			
-			batch.begin();
-			batch.setTransformMatrix(model);
-			deadBoy.draw(batch);
-			batch.end();
-			
-			if(splitBoy2.isfinished) {
-				float y = splitBoy2.getPosition().y;
-				y -= 0.25f;
-				
-				deadBoy.setRotation(boyRotation);
-				model.idt();
-				splitBoy2.normalBoy.setPosition(boy.getPosition().x, y);
-				
-				if(splitBoy2.getPosition().y < 0)  {
-					splitBoy2.dispose();
-					
-					if(splitBoy1.isdead)
-						finished = true;
-				}
-			}
-		}
-		
-		if(boy.isdead && !finished && !boy.isSplit) {
-			
-			Vector3 pos = boy.getPosition();
-			camera.project(pos);
-			
-			stateTime += delta;
-//			currentFrame = boy.getCurrentFrame(stateTime);
-			boy.getCurrentFrame(stateTime).getTexture().setFilter(TextureFilter.Linear, TextureFilter.Linear);
-			
-			Sprite deadBoy = new Sprite(boy.getCurrentFrame(stateTime));
-			
-			deadBoy.setSize(boy.boyBounds.width, boy.boyBounds.height);
-			deadBoy.setPosition(boy.getPosition().x,boy.getPosition().y);
-			deadBoy.setOrigin(boy.getOrigin().x, boy.getOrigin().y);
-			deadBoy.setRotation(boyRotation);
-			model.idt();
-			
-			batch.begin();
-			batch.setTransformMatrix(model);
-			deadBoy.draw(batch);
-			batch.end();
-			
-			if(boy.isfinished) {
-				float y = boy.getPosition().y;
-				y -= 0.25f;
-				
-				deadBoy.setRotation(boyRotation);
-				model.idt();
-				boy.normalBoy.setPosition(boy.getPosition().x, y);
-				
-				if(boy.getPosition().y < 0) 
-					finished = true;
-			}
-			
-		}
-		
-		if (finished) {
-			fade = Math.min(fade + (delta), 1);
-			fadeBatch.begin();
-			blackFade.setColor(blackFade.getColor().r, blackFade.getColor().g,
-					blackFade.getColor().b, fade);
-			blackFade.draw(fadeBatch);
-			fadeBatch.end();
-			if (fade >= 1) {
-				dispose();
-				create();
-			}
-		}
-		
-		if (!finished && fade > 0) {
-			fade = Math.max(fade - (delta), 0);
-			fadeBatch.begin();
-			blackFade.setColor(blackFade.getColor().r, blackFade.getColor().g,
-					blackFade.getColor().b, fade);
-			blackFade.draw(fadeBatch);
-			fadeBatch.end();
-		}
-		
+//		
+//		if(splitBoy1.isdead) {
+//			stateTime += delta;
+////			currentFrame = boy.getCurrentFrame(stateTime);
+//			splitBoy1.getCurrentFrame(stateTime).getTexture().setFilter(TextureFilter.Linear, TextureFilter.Linear);
+//			
+//			Sprite deadBoy = new Sprite(splitBoy1.getCurrentFrame(stateTime));
+//			
+//			deadBoy.setSize(splitBoy1.boyBounds.width, splitBoy1.boyBounds.height);
+//			deadBoy.setPosition(lastPositionBeforeDeath.x,splitBoy1.getPosition().y);
+//			deadBoy.setOrigin(splitBoy1.getOrigin().x, splitBoy1.getOrigin().y);
+//			deadBoy.setRotation(boyRotation);
+//			model.idt();
+//			
+//			batch.begin();
+//			batch.setTransformMatrix(model);
+//			deadBoy.draw(batch);
+//			batch.end();
+//			
+//			if(splitBoy1.isfinished) {
+//				float y = splitBoy1.getPosition().y;
+//				y -= 0.25f;
+//				
+//				deadBoy.setRotation(boyRotation);
+//				model.idt();
+//				splitBoy1.normalBoy.setPosition(boy.getPosition().x, y);
+//				
+//				if(splitBoy1.getPosition().y < 0) {
+//					splitBoy1.dispose();
+//					
+//					if(splitBoy2.isdead)
+//						finished = true;
+//				}
+//			}
+//		}
+//		
+//		if(splitBoy2.isdead) {
+//			stateTime += delta;
+////			currentFrame = boy.getCurrentFrame(stateTime);
+//			splitBoy2.getCurrentFrame(stateTime).getTexture().setFilter(TextureFilter.Linear, TextureFilter.Linear);
+//			
+//			Sprite deadBoy = new Sprite(splitBoy2.getCurrentFrame(stateTime));
+//			
+//			deadBoy.setSize(splitBoy2.boyBounds.width, splitBoy2.boyBounds.height);
+//			deadBoy.setPosition(lastPositionBeforeDeath.x,splitBoy2.getPosition().y);
+//			deadBoy.setOrigin(splitBoy2.getOrigin().x, splitBoy2.getOrigin().y);
+//			deadBoy.setRotation(boyRotation);
+//			model.idt();
+//			
+//			batch.begin();
+//			batch.setTransformMatrix(model);
+//			deadBoy.draw(batch);
+//			batch.end();
+//			
+//			if(splitBoy2.isfinished) {
+//				float y = splitBoy2.getPosition().y;
+//				y -= 0.25f;
+//				
+//				deadBoy.setRotation(boyRotation);
+//				model.idt();
+//				splitBoy2.normalBoy.setPosition(boy.getPosition().x, y);
+//				
+//				if(splitBoy2.getPosition().y < 0)  {
+//					splitBoy2.dispose();
+//					
+//					if(splitBoy1.isdead)
+//						finished = true;
+//				}
+//			}
+//		}
+//		
+//		if(boy.isdead && !finished && !boy.isSplit) {
+//			
+//			Vector3 pos = boy.getPosition();
+//			camera.project(pos);
+//			
+//			stateTime += delta;
+////			currentFrame = boy.getCurrentFrame(stateTime);
+//			boy.getCurrentFrame(stateTime).getTexture().setFilter(TextureFilter.Linear, TextureFilter.Linear);
+//			
+//			Sprite deadBoy = new Sprite(boy.getCurrentFrame(stateTime));
+//			
+//			deadBoy.setSize(boy.boyBounds.width, boy.boyBounds.height);
+//			deadBoy.setPosition(boy.getPosition().x,boy.getPosition().y);
+//			deadBoy.setOrigin(boy.getOrigin().x, boy.getOrigin().y);
+//			deadBoy.setRotation(boyRotation);
+//			model.idt();
+//			
+//			batch.begin();
+//			batch.setTransformMatrix(model);
+//			deadBoy.draw(batch);
+//			batch.end();
+//			
+//			if(boy.isfinished) {
+//				float y = boy.getPosition().y;
+//				y -= 0.25f;
+//				
+//				deadBoy.setRotation(boyRotation);
+//				model.idt();
+//				boy.normalBoy.setPosition(boy.getPosition().x, y);
+//				
+//				if(boy.getPosition().y < 0) 
+//					finished = true;
+//			}
+//			
+//		}
+//		
+//		if (finished) {
+//			fade = Math.min(fade + (delta), 1);
+//			fadeBatch.begin();
+//			blackFade.setColor(blackFade.getColor().r, blackFade.getColor().g,
+//					blackFade.getColor().b, fade);
+//			blackFade.draw(fadeBatch);
+//			fadeBatch.end();
+//			if (fade >= 1) {
+//				dispose();
+//				create();
+//			}
+//		}
+//		
+//		if (!finished && fade > 0) {
+//			fade = Math.max(fade - (delta), 0);
+//			fadeBatch.begin();
+//			blackFade.setColor(blackFade.getColor().r, blackFade.getColor().g,
+//					blackFade.getColor().b, fade);
+//			blackFade.draw(fadeBatch);
+//			fadeBatch.end();
+//		}
+//		
 	}
 
 

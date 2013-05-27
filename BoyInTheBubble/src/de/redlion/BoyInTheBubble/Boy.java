@@ -38,7 +38,35 @@ public class Boy {
 	public final int MAX_POSITIONS = 10;
 	public Array<Vector3> positions = new Array<Vector3>(MAX_POSITIONS);
 	
+	Bubble bubble;
+	
 	public Boy(float width, float height) {
+		
+		boyTex = Resources.getInstance().boyTextures;
+		boySprites = boyTex.createSprites();
+		
+		death = new Animation(0.06f, boyTex.getRegions());
+		death.setPlayMode(Animation.NORMAL);
+		
+		normalBoy = boySprites.get(boySprites.size-1);
+		
+		normalBoy.getTexture().setFilter(TextureFilter.Linear, TextureFilter.Linear);
+		normalBoy.setSize(originalSize, originalSize);
+		normalBoy.setOrigin(normalBoy.getWidth()/2, normalBoy.getHeight()/2);
+		normalBoy.setPosition(width / 4, height / 2);
+		
+		boyBounds = normalBoy.getBoundingRectangle();
+		
+		split_dist = 0;
+		
+		isdead = false;
+		isfinished = false;
+		isSplit = false;
+		
+		bubble = new Bubble(originalSize, getCorrectedPosition());
+	}
+	
+		public Boy(float width, float height,boolean createbubble) {
 		
 		boyTex = Resources.getInstance().boyTextures;
 		boySprites = boyTex.createSprites();
@@ -56,11 +84,12 @@ public class Boy {
 		boyBounds = normalBoy.getBoundingRectangle();
 		
 		split_dist = 0;
-//		sizeModifier = 1.0f;
 		
 		isdead = false;
 		isfinished = false;
 		isSplit = false;
+		
+//		bubble = new Bubble(originalSize, getCorrectedPosition());
 	}
 
 	public Vector3 getCorrectedPosition() {

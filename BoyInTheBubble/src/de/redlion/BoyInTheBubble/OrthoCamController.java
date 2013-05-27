@@ -12,14 +12,15 @@ import com.badlogic.gdx.math.Vector3;
 public class OrthoCamController extends InputAdapter {
 
 	final OrthographicCamera camera;
-	final Vector3 curr = new Vector3();
+
 	final Vector2 last = new Vector2(0, 0);
-	final Vector2 delta = new Vector2();
 	
 	float offsetX = 0;
 	float screenOffsetX = 0;
 	float offsetY = 0;
 	float screenOffsetY = 0;
+	
+	final int SCREENBIAS = 10;
 	
 	boolean touched = false;
 	
@@ -44,8 +45,8 @@ public class OrthoCamController extends InputAdapter {
 			int correctedX = (int) (x - size/2 - screenOffsetX);
 			int correctedY = (int) (y + size/2 + screenOffsetY);
 			
-			correctedX = (int) MathUtils.clamp(correctedX, 0, Gdx.graphics.getWidth() - size);
-			correctedY = (int) MathUtils.clamp(correctedY, size, Gdx.graphics.getHeight());
+			correctedX = (int) MathUtils.clamp(correctedX, -SCREENBIAS, Gdx.graphics.getWidth() - size + SCREENBIAS);
+			correctedY = (int) MathUtils.clamp(correctedY, size-SCREENBIAS, Gdx.graphics.getHeight() + SCREENBIAS);
 			
 			Vector3 newPos = new Vector3(correctedX, correctedY,0);		
 			camera.unproject(newPos);
@@ -53,6 +54,9 @@ public class OrthoCamController extends InputAdapter {
 			normalBoy = GameScreen.boy.normalBoy.getBoundingRectangle();
 			
 			GameScreen.boy.normalBoy.setPosition(newPos.x , newPos.y );
+			
+			GameScreen.boy.bubble.updateTarget();
+			
 			last.set(x,y);
 			
 		}
@@ -63,6 +67,9 @@ public class OrthoCamController extends InputAdapter {
 	@Override
 	public boolean touchUp (int x, int y, int pointer, int button) {
 		touched = false;
+		
+		GameScreen.boy.bubble.destroyMouseJoint();
+		
 		return true;
 	}
 	
@@ -87,6 +94,9 @@ public class OrthoCamController extends InputAdapter {
 		Rectangle box = new Rectangle(pos.x, pos.y, w,h);
 		
 		if(box.contains(x,y) && !GameScreen.boy.isdead) {
+			
+			GameScreen.boy.bubble.createMouseJoint();
+			
 			touched = true;
 			
 //			float sizemod = 1.0f;

@@ -35,7 +35,7 @@ public class Resources {
 		boyTextures = new TextureAtlas(Gdx.files.internal("data/boy.pack"));
 		middle = new Texture(Gdx.files.internal("data/middle.png"));
 //		boyTex = boyTextures.getRegions().get(0).getTexture();
-		Parameters das = new Parameters();
+
 		TmxMapLoader.Parameters p = new TmxMapLoader.Parameters();
 		p.generateMipMaps = true;
 		p.yUp = true;

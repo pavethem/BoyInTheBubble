@@ -144,7 +144,7 @@ public class CollisionDetector {
 		if(GameScreen.splitBoy1.isdead && GameScreen.splitBoy2.isdead)
 			boy.isdead = true;
 		
-//		boy.isdead = false;
+		boy.isdead = false;
 		
 	}
 	
