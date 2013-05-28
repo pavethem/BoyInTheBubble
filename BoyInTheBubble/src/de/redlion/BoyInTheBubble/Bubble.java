@@ -26,7 +26,8 @@ public class Bubble {
 	
 	Body center;
 	Array<Body> circles;
-	Array<DistanceJoint> joints;
+	Array<DistanceJoint> spokes;
+	Array<DistanceJoint> rads;
 	
 	Body mouseBody;
 	MouseJoint mouseJoint;
@@ -42,7 +43,8 @@ public class Bubble {
 		dist = distance;
 		
 		circles = new Array<Body>();
-		joints = new Array<DistanceJoint>();
+		spokes = new Array<DistanceJoint>();
+		rads = new Array<DistanceJoint>();
 		
 		BodyDef circleDef = new BodyDef();
 		
@@ -98,7 +100,7 @@ public class Bubble {
 		    joint1Def.dampingRatio = 1000f;
 		    joint1Def.length = distance;
 		    DistanceJoint joint1 = (DistanceJoint) GameScreen.world.createJoint(joint1Def);
-			joints.add(joint1);
+			spokes.add(joint1);
 
 			DistanceJointDef joint2Def = new DistanceJointDef();
 			joint2Def.bodyA = circles.get(neighborIndex);
@@ -106,8 +108,8 @@ public class Bubble {
 			joint2Def.collideConnected = false;
 			joint2Def.frequencyHz = 110;
 			joint2Def.dampingRatio = 10000;
-			GameScreen.world.createJoint(joint2Def);
-//			joints.add(joint2);
+			DistanceJoint joint2 = (DistanceJoint) GameScreen.world.createJoint(joint2Def);
+			rads.add(joint2);
 		}
 		
 		contactListener = new ContactListener() {
@@ -119,9 +121,9 @@ public class Bubble {
 				center.getFixtureList().get(0).setDensity(11111);
 				center.resetMassData();
 				
-				for(DistanceJoint dj : joints) {
+				for(DistanceJoint dj : spokes) {
 					dj.setFrequency(100);
-					dj.setDampingRatio(100);
+					dj.setDampingRatio(10000);
 				}
 				
 				contact.getFixtureA().getBody().setAwake(false);
@@ -149,7 +151,7 @@ public class Bubble {
 				center.getFixtureList().get(0).setDensity(0);
 				center.resetMassData();
 				
-				for(DistanceJoint dj : joints) {
+				for(DistanceJoint dj : spokes) {
 					dj.setFrequency(1160);
 					dj.setDampingRatio(1000);
 				}
@@ -162,6 +164,22 @@ public class Bubble {
 			@Override
 			public void beginContact(Contact contact) {
 				
+				contact.getFixtureA().getBody().setAwake(false);
+				
+				for (Body c : circles) {
+					c.setAwake(false);
+				}
+				
+				center.setAwake(false);
+				if(mouseBody != null)
+					mouseBody.setAwake(false);
+				
+				for(DistanceJoint dj : rads) {
+					dj.setDampingRatio(100);
+				}
+				for(DistanceJoint dj : spokes) {
+					dj.setDampingRatio(100);
+				}
 			}
 		};
 	
@@ -199,6 +217,13 @@ public class Bubble {
 		}
 		center.setAwake(false);
 		
+		for(DistanceJoint dj : rads) {
+			dj.setDampingRatio(10000);
+		}
+		for(DistanceJoint dj : spokes) {
+			dj.setDampingRatio(1000);
+		}
+		
 		if(mouseJoint != null && mouseBody != null) {
 			GameScreen.world.destroyJoint(mouseJoint);
 			mouseJoint = null;
@@ -209,6 +234,27 @@ public class Bubble {
 	}
 
 	public void updateTarget() {
+		
+		boolean wallTouch = false;
+		
+		if(GameScreen.world.getContactCount() > 0) {
+			for(Contact c : GameScreen.world.getContactList()) {
+				if(c.getFixtureA().getBody().getUserData().equals("wall")) {
+					wallTouch = true;
+					break;
+				}
+			}
+		}
+		
+		if(!wallTouch) {
+			
+			for(DistanceJoint d : spokes) {
+				d.setDampingRatio(0);
+			}
+			for(DistanceJoint j : rads) {
+				j.setDampingRatio(0);
+			}
+		} 
 		
 		float x = GameScreen.boy.getPosition().x + GameScreen.boy.getOrigin().x;
 		float y = GameScreen.boy.getPosition().y + GameScreen.boy.getOrigin().y;

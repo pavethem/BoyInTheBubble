@@ -118,6 +118,7 @@ public class GameScreen implements ApplicationListener {
 		
 		Body wallBody = world.createBody(walls);
 		
+		wallBody.setUserData("wall");
 		ChainShape borders = new ChainShape();
 		Vector2[] vertices = {new Vector2(0,0),new Vector2(camera.viewportWidth,0),new Vector2(camera.viewportWidth,camera.viewportHeight),new Vector2(0,camera.viewportHeight)};
 		borders.createLoop(vertices);
@@ -181,9 +182,10 @@ public class GameScreen implements ApplicationListener {
 		world.step(delta, 60, 20);
 		debugRenderer.render(world, camera.combined);
 		
-		for(Contact c : world.getContactList()) {
-			c.getFixtureB().setDensity(1000);
-		}
+		
+//		for(Contact c : world.getContactList()) {
+//			c.getFixtureB().setDensity(1000);
+//		}
 
 //		
 //		if(!boy.isdead) {
