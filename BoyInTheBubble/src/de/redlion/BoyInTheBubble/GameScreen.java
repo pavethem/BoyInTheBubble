@@ -1,5 +1,7 @@
 package de.redlion.BoyInTheBubble;
 
+import java.util.Iterator;
+
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL10;
@@ -10,6 +12,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Matrix4;
@@ -20,14 +23,6 @@ import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.ChainShape;
-import com.badlogic.gdx.physics.box2d.CircleShape;
-import com.badlogic.gdx.physics.box2d.Contact;
-import com.badlogic.gdx.physics.box2d.ContactListener;
-import com.badlogic.gdx.physics.box2d.Filter;
-import com.badlogic.gdx.physics.box2d.Fixture;
-import com.badlogic.gdx.physics.box2d.FixtureDef;
-import com.badlogic.gdx.physics.box2d.MassData;
-import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 
 public class GameScreen implements ApplicationListener {
@@ -180,52 +175,64 @@ public class GameScreen implements ApplicationListener {
 		
 		delta = Math.min(0.1f, Gdx.graphics.getDeltaTime());	
 		world.step(delta, 60, 20);
-		debugRenderer.render(world, camera.combined);
-		
-		
-//		for(Contact c : world.getContactList()) {
-//			c.getFixtureB().setDensity(1000);
-//		}
 
-//		
-//		if(!boy.isdead) {
-//			if(!boy.isSplit && splitBoy1.split_dist <= 0) {
-//				boyRotation -= delta * ROTATION_MULTIPLIER;
-//				splitRotation = boyRotation;
-//			} else {
-//				splitRotation -= delta * ROTATION_MULTIPLIER;
-//			}
-////			camera.translate(delta * 2, 0);
-////			camera.update();
-//			tiled.setView(camera);
-//		}
-////		tiled.render();
-//		
-//		if(boy.isSplit) {
-//			splitBoy1.normalBoy.setRotation(boyRotation);
-//			splitBoy2.normalBoy.setRotation(boyRotation);
-//			
-//			if(splitBoy1.split_dist <= splitBoy1.SPLIT_DISTANCE) {
-//				splitBoy1.normalBoy.setPosition(splitBoy1.normalBoy.getX(),splitBoy1.normalBoy.getY() + delta);
-//				splitBoy1.split_dist += delta;
-//			}
-//			if(splitBoy2.split_dist >= -splitBoy2.SPLIT_DISTANCE) {
-//				splitBoy2.normalBoy.setPosition(splitBoy2.normalBoy.getX(),splitBoy2.normalBoy.getY() - delta);
-//				splitBoy2.split_dist -= delta;
-//			}
-//		} else {
-//			if(splitBoy1.split_dist >= 0) {
-//				splitBoy1.normalBoy.setPosition(splitBoy1.normalBoy.getX(),splitBoy1.normalBoy.getY() - delta);
-//				splitBoy1.split_dist -= delta;
-//			}
-//			if(splitBoy2.split_dist <= 0) {
-//				splitBoy2.normalBoy.setPosition(splitBoy2.normalBoy.getX(),splitBoy2.normalBoy.getY() + delta);
-//				splitBoy2.split_dist += delta;
-//			}
-//		}
-//		
+		if(!boy.isdead) {
+			if(!boy.isSplit && splitBoy1.split_dist <= 0) {
+				boyRotation -= delta * ROTATION_MULTIPLIER;
+				splitRotation = boyRotation;
+			} else {
+				splitRotation -= delta * ROTATION_MULTIPLIER;
+			}
+			camera.translate(delta * 2, 0);
+			camera.update();
+			tiled.setView(camera);
+			
+//			debugRenderer.render(world, boyCam.combined);
+			
+			//render bubble
+			r.begin(ShapeType.Line);
+			r.setColor(0, 0, 0, 0);
+			r.setProjectionMatrix(boyCam.combined);
+
+			for(int i=0;i<boy.bubble.circles.size;i++) {
+				Vector2 p1 = boy.bubble.circles.get(i).getPosition();
+				Vector2 p2 = boy.bubble.circles.get(0).getPosition();
+				if(i<boy.bubble.circles.size-1)
+					p2 = boy.bubble.circles.get(i+1).getPosition();
+				
+				r.line(p1.x, p1.y, p2.x, p2.y);
+				
+			}
+			
+			r.end();
+		}
+		tiled.render();
+		
+		if(boy.isSplit) {
+			splitBoy1.normalBoy.setRotation(boyRotation);
+			splitBoy2.normalBoy.setRotation(boyRotation);
+			
+			if(splitBoy1.split_dist <= splitBoy1.SPLIT_DISTANCE) {
+				splitBoy1.normalBoy.setPosition(splitBoy1.normalBoy.getX(),splitBoy1.normalBoy.getY() + delta);
+				splitBoy1.split_dist += delta;
+			}
+			if(splitBoy2.split_dist >= -splitBoy2.SPLIT_DISTANCE) {
+				splitBoy2.normalBoy.setPosition(splitBoy2.normalBoy.getX(),splitBoy2.normalBoy.getY() - delta);
+				splitBoy2.split_dist -= delta;
+			}
+		} else {
+			if(splitBoy1.split_dist >= 0) {
+				splitBoy1.normalBoy.setPosition(splitBoy1.normalBoy.getX(),splitBoy1.normalBoy.getY() - delta);
+				splitBoy1.split_dist -= delta;
+			}
+			if(splitBoy2.split_dist <= 0) {
+				splitBoy2.normalBoy.setPosition(splitBoy2.normalBoy.getX(),splitBoy2.normalBoy.getY() + delta);
+				splitBoy2.split_dist += delta;
+			}
+		}
+		
 //		collisionDetector.collisionCheck(boy, layer, tiled.getViewBounds());
-//		
+		
 		if(!boy.isdead) {
 			
 			Vector3 position = boy.getCorrectedPosition();
