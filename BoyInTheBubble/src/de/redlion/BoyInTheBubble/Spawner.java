@@ -45,7 +45,6 @@ public class Spawner {
 		
 		for(Rectangle r : rectangles) {
 			if(Math.abs(r.x - x) < EPSILON) {
-				System.out.println(":)");
 				rectangles.remove(r);
 				break;
 			}
