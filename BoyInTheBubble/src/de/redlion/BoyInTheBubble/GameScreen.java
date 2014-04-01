@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Matrix4;
@@ -161,7 +162,7 @@ public class GameScreen implements ApplicationListener {
 			}
 		}
 		
-		collisionDetector.collisionCheck(boy, layer, tiled.getViewBounds());
+//		collisionDetector.collisionCheck(boy, layer, tiled.getViewBounds());
 		
 		if(!boy.isdead) {
 			
@@ -233,7 +234,8 @@ public class GameScreen implements ApplicationListener {
 			else if(boy.isSplit || splitBoy1.split_dist >= 0) {
 				
 				//render middle
-				middle.setPosition(boy.getOrigin().x / 2 + boy.getPosition().x, boy.getOrigin().y / 2 + boy.getPosition().y);
+				//NO IDEA WHY 1.2f but it works
+				middle.setPosition(boy.getOrigin().x / 1.2f + boy.getPosition().x, boy.getOrigin().y / 1.2f + boy.getPosition().y);
 
 				position.set(-middle.getX() - middle.getOriginX(), -middle.getY() - middle.getOriginY(), 0);
 				model.idt();
@@ -255,8 +257,9 @@ public class GameScreen implements ApplicationListener {
 				if(!splitBoy1.isdead) {
 					position.set(splitBoy1.split_dist, splitBoy1.split_dist,0);
 					position.rotate(Vector3.Z, splitRotation);
-					position.add(-middle.getOriginX()*2+middle.getX(),-middle.getOriginY()*2 + middle.getY(),0);
-		
+					//NO IDEA WHY *5
+					position.add(-middle.getOriginX()*5+middle.getX(),-middle.getOriginY()*5 + middle.getY(),0);
+					
 					splitBoy1.normalBoy.setPosition(position.x,position.y);
 					splitBoy1.boyBounds.setX(position.x);
 					splitBoy1.boyBounds.setY(position.y);
@@ -275,7 +278,8 @@ public class GameScreen implements ApplicationListener {
 				if(!splitBoy2.isdead) {
 					position.set(splitBoy2.split_dist, splitBoy2.split_dist,0);
 					position.rotate(Vector3.Z, splitRotation);
-					position.add(-middle.getOriginX()*2+middle.getX(),-middle.getOriginY()*2 + middle.getY(),0);
+					//NO IDEA WHY *5
+					position.add(-middle.getOriginX()*5+middle.getX(),-middle.getOriginY()*5 + middle.getY(),0);
 		
 					splitBoy2.normalBoy.setPosition(position.x,position.y);
 					splitBoy2.boyBounds.setX(position.x);
@@ -290,6 +294,8 @@ public class GameScreen implements ApplicationListener {
 					batch.end();
 				}
 				
+				
+				//DEBUG SPLIT
 //				Vector3 yob = boy.getPosition().cpy();
 //				yob.x += tiled.getViewBounds().x + boy.normalBoy.getOriginX() ;
 //				yob.y += boy.normalBoy.getOriginY() ;
@@ -307,6 +313,7 @@ public class GameScreen implements ApplicationListener {
 //				r.setColor(1,0,0,1);
 //				r.line(from.x,from.y,to.x,to.y);
 //				r.circle(yob.x, yob.y, 2);
+//				r.setColor(0,1,0,1);
 //				r.circle(mid.x, mid.y, 2);
 //				r.end();
 			}

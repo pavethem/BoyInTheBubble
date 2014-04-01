@@ -30,7 +30,7 @@ public class Boy {
 	public float smallSize = 1.5f;
 	public float bigSize = 5f;
 	
-	public final float SPLIT_DISTANCE = 1.4f;
+	public final float SPLIT_DISTANCE = 1.9f;
 //	public final float MAX_GROWTH_MOD = 1.03f;
 //	public final float MAX_SHRINK_MOD = 1.03f;
 	
