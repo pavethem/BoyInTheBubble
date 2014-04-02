@@ -169,9 +169,9 @@ public class Bubble {
 
 		mjd.bodyA = mouseBody;
 		mjd.bodyB = center;
-		mjd.dampingRatio = 1f;
+		mjd.dampingRatio = 0f;
 		mjd.frequencyHz = 0.01f;
-		mjd.maxForce = 1;
+		mjd.maxForce = 0;
 		mjd.collideConnected = false;
 		mjd.target.set(v);
 
@@ -232,13 +232,13 @@ public class Bubble {
 //			
 //			if(contactCount > 0) {
 //				for(Contact c : GameScreen.world.getContactList()) {
-//					if(c.getFixtureB().getBody().equals(circles.get(i))) {
+//					if(c.getFixtureA().getBody().getUserData() != null && c.getFixtureA().getBody().getUserData().equals("wall")) {
 //						toucheswall = true;	
 //					}
 //				}
 //			}
 //			
-//			if(circles.get(i).getPosition().dst(center.getPosition()) > 1.6f) {
+//			if(circles.get(i).getPosition().dst(center.getPosition()) > dist) {
 //				circles.get(i).setAwake(true);
 //				toucheswall = false;
 //			}
@@ -246,7 +246,7 @@ public class Bubble {
 	        y = MathUtils.sinDeg(360/NUM_SEGMENTS*i) * dist;
 //			
 //			if(!toucheswall) {
-//			if(!toucheswall)
+			if(!toucheswall)
 				circles.get(i).setTransform(center.getPosition().add(x,y), 0);
 //			} else {
 ////				y = center.getPosition().y;

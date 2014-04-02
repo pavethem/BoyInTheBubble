@@ -129,7 +129,7 @@ public class GameScreen implements ApplicationListener {
 				new Vector2(camera.viewportWidth/Constants.PIXELS_PER_METER,camera.viewportHeight/Constants.PIXELS_PER_METER),
 				new Vector2(0,camera.viewportHeight/Constants.PIXELS_PER_METER)};
 		borders.createLoop(vertices);
-		borders.setRadius(0.01f);
+		borders.setRadius(1);
 		wallBody.createFixture(borders,100f).setFriction(0);
 		borders.dispose();
 		
@@ -157,6 +157,7 @@ public class GameScreen implements ApplicationListener {
 		
 		delta = Math.min(0.1f, Gdx.graphics.getDeltaTime());	
 		world.step(delta, 60, 20);
+		world.clearForces();
 		
 		if(!boy.isdead) {
 			if(!boy.isSplit && splitBoy1.split_dist <= 0) {
@@ -168,7 +169,7 @@ public class GameScreen implements ApplicationListener {
 			camera.translate(delta * 2, 0);
 			camera.update();
 			tiled.setView(camera);
-			debugRenderer.render(world, boyCam.combined.cpy().scale(Constants.PIXELS_PER_METER, Constants.PIXELS_PER_METER, Constants.PIXELS_PER_METER));
+			debugRenderer.render(world, boyCam.combined.cpy().scale(Constants.PIXELS_PER_METER, Constants.PIXELS_PER_METER, 0));
 		}
 //		tiled.render();
 		
