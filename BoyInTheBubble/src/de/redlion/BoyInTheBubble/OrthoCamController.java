@@ -50,6 +50,7 @@ public class OrthoCamController extends InputAdapter {
 			Vector3 newPos = new Vector3(correctedX, correctedY,0);		
 			camera.unproject(newPos);
 			
+			GameScreen.boy.bubble.updateTarget();
 			normalBoy = GameScreen.boy.normalBoy.getBoundingRectangle();
 			
 			GameScreen.boy.normalBoy.setPosition(newPos.x , newPos.y );
@@ -63,6 +64,7 @@ public class OrthoCamController extends InputAdapter {
 	@Override
 	public boolean touchUp (int x, int y, int pointer, int button) {
 		touched = false;
+		GameScreen.boy.bubble.destroyMouseJoint();
 		return true;
 	}
 	
@@ -88,7 +90,7 @@ public class OrthoCamController extends InputAdapter {
 		
 		if(box.contains(x,y) && !GameScreen.boy.isdead) {
 			touched = true;
-			
+			GameScreen.boy.bubble.createMouseJoint();
 //			float sizemod = 1.0f;
 //			if(GameScreen.boy.isBig)
 //				sizemod = 1 + GameScreen.boy.normalBoy.getWidth() - 1.5f;

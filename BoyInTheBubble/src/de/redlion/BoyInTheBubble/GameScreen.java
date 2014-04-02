@@ -13,7 +13,14 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
+import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
+import com.badlogic.gdx.physics.box2d.ChainShape;
+import com.badlogic.gdx.physics.box2d.World;
 
 public class GameScreen implements ApplicationListener {
 	private OrthographicCamera camera;
@@ -53,6 +60,9 @@ public class GameScreen implements ApplicationListener {
 	
 	CollisionDetector collisionDetector;
 	
+	public static World world;
+	Box2DDebugRenderer debugRenderer;
+	
 	ShapeRenderer r;
 	
 	@Override
@@ -79,9 +89,20 @@ public class GameScreen implements ApplicationListener {
 		camController = new OrthoCamController(boyCam);
 		Gdx.input.setInputProcessor(camController);
 		
-		boy = new Boy(camera.viewportWidth, camera.viewportHeight);
-		splitBoy1 = new Boy(camera.viewportWidth, camera.viewportHeight);
-		splitBoy2 = new Boy(camera.viewportWidth, camera.viewportHeight);
+		world = new World(new Vector2(0,0), true);
+		debugRenderer = new Box2DDebugRenderer();
+		
+		BodyDef walls = new BodyDef();
+		walls.type = BodyType.StaticBody;
+		walls.position.set(0,0);
+		
+		Body wallBody = world.createBody(walls);
+		
+		boy = new Boy(camera.viewportWidth, camera.viewportHeight,true);
+		splitBoy1 = new Boy(camera.viewportWidth, camera.viewportHeight,false);
+		splitBoy2 = new Boy(camera.viewportWidth, camera.viewportHeight,false);
+		
+		world.setContactListener(boy.bubble.contactListener);
 		
 		middle = new Sprite(Resources.getInstance().middle);
 		middle.getTexture().setFilter(TextureFilter.Linear, TextureFilter.Linear);
@@ -101,6 +122,16 @@ public class GameScreen implements ApplicationListener {
 		stateTime = 0;
 		finished = false;
 		fade = 1.0f;
+		
+		wallBody.setUserData("wall");
+		ChainShape borders = new ChainShape();
+		Vector2[] vertices = {new Vector2(0,0),new Vector2(camera.viewportWidth / Constants.PIXELS_PER_METER,0),
+				new Vector2(camera.viewportWidth/Constants.PIXELS_PER_METER,camera.viewportHeight/Constants.PIXELS_PER_METER),
+				new Vector2(0,camera.viewportHeight/Constants.PIXELS_PER_METER)};
+		borders.createLoop(vertices);
+		borders.setRadius(0.01f);
+		wallBody.createFixture(borders,100f).setFriction(0);
+		borders.dispose();
 		
 		lastPosition = new Vector3(0, 0, 0);
 		
@@ -124,7 +155,8 @@ public class GameScreen implements ApplicationListener {
 		Gdx.gl.glClearColor(1, 1, 1, 1);
 		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
 		
-		delta = Math.min(0.1f, Gdx.graphics.getDeltaTime());		
+		delta = Math.min(0.1f, Gdx.graphics.getDeltaTime());	
+		world.step(delta, 60, 20);
 		
 		if(!boy.isdead) {
 			if(!boy.isSplit && splitBoy1.split_dist <= 0) {
@@ -136,8 +168,9 @@ public class GameScreen implements ApplicationListener {
 			camera.translate(delta * 2, 0);
 			camera.update();
 			tiled.setView(camera);
+			debugRenderer.render(world, boyCam.combined.cpy().scale(Constants.PIXELS_PER_METER, Constants.PIXELS_PER_METER, Constants.PIXELS_PER_METER));
 		}
-		tiled.render();
+//		tiled.render();
 		
 		if(boy.isSplit) {
 			splitBoy1.normalBoy.setRotation(boyRotation);
