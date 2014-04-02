@@ -11,6 +11,8 @@ public class Main {
 		cfg.samples = 4;
 		cfg.width = 480;
 		cfg.height = 320;
+		cfg.vSyncEnabled = true;
+		cfg.foregroundFPS = 60;
 		
 		new LwjglApplication(new GameScreen(), cfg);
 	}
