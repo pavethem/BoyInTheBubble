@@ -25,6 +25,7 @@ public class Boy {
 //	public float sizeModifier;
 	
 	public float originalSize = 3f; // macht 120px
+	public float bubbleSize = 3.3f; // bisschen größer
 	public int size = 120;
 	public int targetSize = 120;
 	public float smallSize = 1.5f;
@@ -38,7 +39,7 @@ public class Boy {
 	public final int MAX_POSITIONS = 10;
 	public Array<Vector3> positions = new Array<Vector3>(MAX_POSITIONS);
 	
-	Bubble bubble;
+	Bubble2D bubble;
 	
 	public Boy(float width, float height, boolean createBubble) {
 		
@@ -65,7 +66,7 @@ public class Boy {
 		isSplit = false;
 		
 		if(createBubble)
-			bubble = new Bubble(originalSize, getCorrectedPosition());
+			bubble = new Bubble2D(bubbleSize, getCorrectedPosition());
 	}
 
 	public Vector3 getCorrectedPosition() {

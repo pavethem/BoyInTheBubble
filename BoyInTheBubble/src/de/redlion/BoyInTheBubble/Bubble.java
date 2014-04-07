@@ -12,6 +12,7 @@ import com.badlogic.gdx.physics.box2d.ContactImpulse;
 import com.badlogic.gdx.physics.box2d.ContactListener;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.Manifold;
+import com.badlogic.gdx.physics.box2d.MassData;
 import com.badlogic.gdx.physics.box2d.joints.DistanceJoint;
 import com.badlogic.gdx.physics.box2d.joints.DistanceJointDef;
 import com.badlogic.gdx.physics.box2d.joints.MouseJoint;
@@ -84,7 +85,7 @@ public class Bubble {
 	        subCircle.setBullet(true);
 	        subCircle.setFixedRotation(true);
 	        CircleShape subCircleShape = new CircleShape();
-	        subCircleShape.setRadius(0.1f / Constants.PIXELS_PER_METER);
+	        subCircleShape.setRadius(0.18f / Constants.PIXELS_PER_METER);
 	        FixtureDef subCircleData = new FixtureDef();
 	        subCircleData.shape = subCircleShape;
 	        subCircleData.density = 5f;
@@ -140,12 +141,20 @@ public class Bubble {
 			public void preSolve(Contact contact, Manifold oldManifold) {
 				// TODO Auto-generated method stub
 				
+				
 			}
 
 			@Override
 			public void postSolve(Contact contact, ContactImpulse impulse) {
 				// TODO Auto-generated method stub
-				
+				if(contact.getFixtureB().getBody().getUserData() != null && contact.getFixtureB().getBody().getUserData().equals("circle")) {
+					Vector2 pos = contact.getFixtureB().getBody().getPosition().cpy().scl(Constants.PIXELS_PER_METER);
+					System.out.println(contact.getFixtureB().getBody().getPosition().scl(Constants.PIXELS_PER_METER));
+					if(pos.x <= 15 || pos.x >= 30)
+						contact.getFixtureB().getBody().setUserData("dontLEFTRIGHT");
+					else if(pos.y <= 1 || pos.y >= 19)
+						contact.getFixtureB().getBody().setUserData("dontBOTTOMTOP");
+				}
 			}
 			
 		};
@@ -227,6 +236,17 @@ public class Bubble {
 		for(int i=0;i<NUM_SEGMENTS;i++){
 //
 			boolean toucheswall = false;
+			if(circles.get(i).getUserData() != null && (circles.get(i).getUserData().equals("dontLEFTRIGHT") || 
+					circles.get(i).getUserData().equals("dontBOTTOMTOP"))) {
+				toucheswall = true;
+			}
+			
+			if(toucheswall) {
+				if(circles.get(i).getPosition().dst(center.getPosition()) >= dist) {
+					toucheswall = false;
+					circles.get(i).setUserData("circle");
+				}
+			}
 //			
 //			circles.get(i).setAwake(false);
 //			
@@ -242,12 +262,24 @@ public class Bubble {
 //				circles.get(i).setAwake(true);
 //				toucheswall = false;
 //			}
+			
 			x = MathUtils.cosDeg(360/NUM_SEGMENTS*i) * dist;
 	        y = MathUtils.sinDeg(360/NUM_SEGMENTS*i) * dist;
-//			
-//			if(!toucheswall) {
+
 			if(!toucheswall)
 				circles.get(i).setTransform(center.getPosition().add(x,y), 0);
+			else {
+				if(circles.get(i).getUserData().equals("dontLEFTRIGHT")) {
+					x = circles.get(i).getPosition().x;
+					y = center.getPosition().add(x,y).y;
+				
+				}
+				else if (circles.get(i).getUserData().equals("dontBOTTOMTOP")) {
+					x = center.getPosition().add(x,y).x;
+					y = circles.get(i).getPosition().y;
+				}
+				circles.get(i).setTransform(x,y, 0);
+			}
 //			} else {
 ////				y = center.getPosition().y;
 ////				circles.get(i).setAwake(true);

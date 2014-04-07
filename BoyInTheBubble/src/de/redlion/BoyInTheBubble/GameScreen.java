@@ -61,7 +61,7 @@ public class GameScreen implements ApplicationListener {
 	CollisionDetector collisionDetector;
 	
 	public static World world;
-	Box2DDebugRenderer debugRenderer;
+//	Box2DDebugRenderer debugRenderer;
 	
 	ShapeRenderer r;
 	
@@ -89,20 +89,20 @@ public class GameScreen implements ApplicationListener {
 		camController = new OrthoCamController(boyCam);
 		Gdx.input.setInputProcessor(camController);
 		
-		world = new World(new Vector2(0,0), true);
-		debugRenderer = new Box2DDebugRenderer();
+//		world = new World(new Vector2(0,0), true);
+//		debugRenderer = new Box2DDebugRenderer();
 		
 		BodyDef walls = new BodyDef();
 		walls.type = BodyType.StaticBody;
 		walls.position.set(0,0);
 		
-		Body wallBody = world.createBody(walls);
+//		Body wallBody = world.createBody(walls);
 		
 		boy = new Boy(camera.viewportWidth, camera.viewportHeight,true);
 		splitBoy1 = new Boy(camera.viewportWidth, camera.viewportHeight,false);
 		splitBoy2 = new Boy(camera.viewportWidth, camera.viewportHeight,false);
 		
-		world.setContactListener(boy.bubble.contactListener);
+//		world.setContactListener(boy.bubble.contactListener);
 		
 		middle = new Sprite(Resources.getInstance().middle);
 		middle.getTexture().setFilter(TextureFilter.Linear, TextureFilter.Linear);
@@ -123,15 +123,15 @@ public class GameScreen implements ApplicationListener {
 		finished = false;
 		fade = 1.0f;
 		
-		wallBody.setUserData("wall");
-		ChainShape borders = new ChainShape();
-		Vector2[] vertices = {new Vector2(0,0),new Vector2(camera.viewportWidth / Constants.PIXELS_PER_METER,0),
-				new Vector2(camera.viewportWidth/Constants.PIXELS_PER_METER,camera.viewportHeight/Constants.PIXELS_PER_METER),
-				new Vector2(0,camera.viewportHeight/Constants.PIXELS_PER_METER)};
-		borders.createLoop(vertices);
-		borders.setRadius(1);
-		wallBody.createFixture(borders,100f).setFriction(0);
-		borders.dispose();
+//		wallBody.setUserData("wall");
+//		ChainShape borders = new ChainShape();
+//		Vector2[] vertices = {new Vector2(0,0),new Vector2(camera.viewportWidth / Constants.PIXELS_PER_METER,0),
+//				new Vector2(camera.viewportWidth/Constants.PIXELS_PER_METER,camera.viewportHeight/Constants.PIXELS_PER_METER),
+//				new Vector2(0,camera.viewportHeight/Constants.PIXELS_PER_METER)};
+//		borders.createLoop(vertices);
+//		borders.setRadius(0);
+//		wallBody.createFixture(borders,100f).setFriction(0);
+//		borders.dispose();
 		
 		lastPosition = new Vector3(0, 0, 0);
 		
@@ -140,6 +140,7 @@ public class GameScreen implements ApplicationListener {
 		splitRotation = 0;
 		collisionDetector = new CollisionDetector(tiled.getMap().getLayers());
 		
+		Gdx.gl20.glLineWidth(10);
 	}
 
 	@Override
@@ -156,8 +157,8 @@ public class GameScreen implements ApplicationListener {
 		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
 		
 		delta = Math.min(0.1f, Gdx.graphics.getDeltaTime());	
-		world.step(delta, 60, 20);
-		world.clearForces();
+//		world.step(delta, 60, 20);
+//		world.clearForces();
 		
 		if(!boy.isdead) {
 			if(!boy.isSplit && splitBoy1.split_dist <= 0) {
@@ -169,7 +170,7 @@ public class GameScreen implements ApplicationListener {
 			camera.translate(delta * 2, 0);
 			camera.update();
 			tiled.setView(camera);
-			debugRenderer.render(world, boyCam.combined.cpy().scale(Constants.PIXELS_PER_METER, Constants.PIXELS_PER_METER, 0));
+//			debugRenderer.render(world, boyCam.combined.cpy().scale(Constants.PIXELS_PER_METER, Constants.PIXELS_PER_METER, 0));
 		}
 //		tiled.render();
 		
@@ -328,7 +329,6 @@ public class GameScreen implements ApplicationListener {
 					batch.end();
 				}
 				
-				
 				//DEBUG SPLIT
 //				Vector3 yob = boy.getPosition().cpy();
 //				yob.x += tiled.getViewBounds().x + boy.normalBoy.getOriginX() ;
@@ -352,6 +352,31 @@ public class GameScreen implements ApplicationListener {
 //				r.end();
 			}
 		}
+		
+		//render bubble
+		r.begin(ShapeType.Line);
+		r.setColor(0, 0, 0, 1);
+		for (int i = 0; i < boy.bubble.circles.size -1; i++) {
+			Vector3 temp1 = new Vector3();
+			temp1.set(boy.bubble.circles.get(i).x,boy.bubble.circles.get(i).y,0);
+			boyCam.project(temp1);
+			Vector3 temp2 = new Vector3();
+			temp2.set(boy.bubble.circles.get(i+1).x,boy.bubble.circles.get(i+1).y,0);
+			boyCam.project(temp2);
+			
+			r.line(temp1,temp2);
+			
+			if(i+1==boy.bubble.circles.size -1) {
+				temp1.set(boy.bubble.circles.get(0).x,boy.bubble.circles.get(0).y,0);
+				boyCam.project(temp1);
+				r.line(temp2,temp1);
+			}
+		}
+		Vector3 cent = new Vector3();
+		cent.set(boy.bubble.center.x, boy.bubble.center.y,0);
+		boyCam.project(cent);
+//		r.circle(cent.x, cent.y, 10);
+		r.end();
 		
 		if(splitBoy1.isdead) {
 			stateTime += delta;
