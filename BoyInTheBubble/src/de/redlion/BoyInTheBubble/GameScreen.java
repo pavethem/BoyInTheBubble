@@ -86,21 +86,23 @@ public class GameScreen implements ApplicationListener {
 		boyCam.setToOrtho(false, 32, 20);
 		tiled.setView(camera);
 
-		camController = new OrthoCamController(boyCam);
-		Gdx.input.setInputProcessor(camController);
+
 		
 //		world = new World(new Vector2(0,0), true);
 //		debugRenderer = new Box2DDebugRenderer();
 		
-		BodyDef walls = new BodyDef();
-		walls.type = BodyType.StaticBody;
-		walls.position.set(0,0);
+//		BodyDef walls = new BodyDef();
+//		walls.type = BodyType.StaticBody;
+//		walls.position.set(0,0);
 		
 //		Body wallBody = world.createBody(walls);
 		
 		boy = new Boy(camera.viewportWidth, camera.viewportHeight,true);
 		splitBoy1 = new Boy(camera.viewportWidth, camera.viewportHeight,false);
 		splitBoy2 = new Boy(camera.viewportWidth, camera.viewportHeight,false);
+		
+		camController = new OrthoCamController(boyCam);
+		Gdx.input.setInputProcessor(camController);
 		
 //		world.setContactListener(boy.bubble.contactListener);
 		
@@ -159,6 +161,30 @@ public class GameScreen implements ApplicationListener {
 		delta = Math.min(0.1f, Gdx.graphics.getDeltaTime());	
 //		world.step(delta, 60, 20);
 //		world.clearForces();
+		
+		// render bubble
+		r.begin(ShapeType.Line);
+		r.setColor(0, 0, 0, 1);
+		for (int i = 0; i < boy.bubble.circles.size - 1; i++) {
+			Vector3 temp1 = new Vector3();
+			temp1.set(boy.bubble.circles.get(i).x, boy.bubble.circles.get(i).y,
+					0);
+			boyCam.project(temp1);
+			Vector3 temp2 = new Vector3();
+			temp2.set(boy.bubble.circles.get(i + 1).x,
+					boy.bubble.circles.get(i + 1).y, 0);
+			boyCam.project(temp2);
+
+			r.line(temp1, temp2);
+
+			if (i + 1 == boy.bubble.circles.size - 1) {
+				temp1.set(boy.bubble.circles.get(0).x,
+						boy.bubble.circles.get(0).y, 0);
+				boyCam.project(temp1);
+				r.line(temp2, temp1);
+			}
+		}
+		r.end();
 		
 		if(!boy.isdead) {
 			if(!boy.isSplit && splitBoy1.split_dist <= 0) {
@@ -352,31 +378,6 @@ public class GameScreen implements ApplicationListener {
 //				r.end();
 			}
 		}
-		
-		//render bubble
-		r.begin(ShapeType.Line);
-		r.setColor(0, 0, 0, 1);
-		for (int i = 0; i < boy.bubble.circles.size -1; i++) {
-			Vector3 temp1 = new Vector3();
-			temp1.set(boy.bubble.circles.get(i).x,boy.bubble.circles.get(i).y,0);
-			boyCam.project(temp1);
-			Vector3 temp2 = new Vector3();
-			temp2.set(boy.bubble.circles.get(i+1).x,boy.bubble.circles.get(i+1).y,0);
-			boyCam.project(temp2);
-			
-			r.line(temp1,temp2);
-			
-			if(i+1==boy.bubble.circles.size -1) {
-				temp1.set(boy.bubble.circles.get(0).x,boy.bubble.circles.get(0).y,0);
-				boyCam.project(temp1);
-				r.line(temp2,temp1);
-			}
-		}
-		Vector3 cent = new Vector3();
-		cent.set(boy.bubble.center.x, boy.bubble.center.y,0);
-		boyCam.project(cent);
-//		r.circle(cent.x, cent.y, 10);
-		r.end();
 		
 		if(splitBoy1.isdead) {
 			stateTime += delta;

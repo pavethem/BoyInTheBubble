@@ -13,8 +13,8 @@ public class OrthoCamController extends InputAdapter {
 
 	final OrthographicCamera camera;
 	final Vector3 curr = new Vector3();
-	final Vector2 last = new Vector2(0, 0);
-	final Vector2 delta = new Vector2();
+	final Vector2 last = new Vector2();
+	float delta = 0f;
 	
 	float offsetX = 0;
 	float screenOffsetX = 0;
@@ -27,6 +27,9 @@ public class OrthoCamController extends InputAdapter {
 	
 	public OrthoCamController (OrthographicCamera camera) {
 		this.camera = camera;
+		Vector3 pos = GameScreen.boy.getCorrectedPosition();
+		camera.project(pos);
+		last.set(-pos.x, Gdx.graphics.getHeight()+pos.y);
 	}
 	
 	@Override
@@ -34,9 +37,7 @@ public class OrthoCamController extends InputAdapter {
 		
 		if(GameScreen.boy.isdead)
 			return true;
-		
-		
-		
+			
 		if(touched) {
 			
 			float size =  GameScreen.boy.size;
@@ -53,10 +54,12 @@ public class OrthoCamController extends InputAdapter {
 			
 			GameScreen.boy.normalBoy.setPosition(newPos.x , newPos.y );
 			GameScreen.boy.bubble.updateTarget(newPos.x,newPos.y);
-			last.set(x,y);
 			
+			System.out.println(delta);
+			delta = last.dst(new Vector2(x, y));
+			last.set(x,y);
 		}
-		
+		System.out.println(delta);
 		return true;
 	}
 	
@@ -124,6 +127,7 @@ public class OrthoCamController extends InputAdapter {
 			newPos.y += GameScreen.boy.getOrigin().y;
 			
 			GameScreen.boy.normalBoy.setPosition(newPos.x -offsetX , newPos.y -offsetY);
+//			last.set(x,y);
 		}
 		
 		return true;
