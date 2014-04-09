@@ -55,11 +55,9 @@ public class OrthoCamController extends InputAdapter {
 			GameScreen.boy.normalBoy.setPosition(newPos.x , newPos.y );
 			GameScreen.boy.bubble.updateTarget(newPos.x,newPos.y);
 			
-			System.out.println(delta);
 			delta = last.dst(new Vector2(x, y));
 			last.set(x,y);
 		}
-		System.out.println(delta);
 		return true;
 	}
 	

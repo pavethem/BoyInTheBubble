@@ -1,6 +1,7 @@
 package de.redlion.BoyInTheBubble;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
@@ -12,11 +13,12 @@ public class Bubble2D {
 	
 	Vector2 center;
 	Array<Vector2> circles;
+	Circle boundingCircle;
 	
 	float dist;
 	
-	float camWidth = Gdx.graphics.getWidth() / 40;
-	float camHeight = Gdx.graphics.getHeight() / 40;
+	private float camWidth = Gdx.graphics.getWidth() / (1/GameScreen.tiled.getUnitScale());
+	private float camHeight = Gdx.graphics.getHeight() / (1/GameScreen.tiled.getUnitScale());
 	
 	public Bubble2D(float distance, Vector3 pos) {
 		
@@ -35,6 +37,8 @@ public class Bubble2D {
 	        circles.add(position);
 		}
 		
+		boundingCircle = new Circle(center, dist);
+		
 	}
 	
 	public void updateTarget(float x, float y) {
@@ -43,6 +47,8 @@ public class Bubble2D {
 		y += GameScreen.boy.getOrigin().y;
 		
 		center.set(x, y);
+		boundingCircle.setPosition(center);
+		
 		for(int i=0;i<NUM_SEGMENTS;i++){
 			boolean toucheswall = false;
 			

@@ -2,19 +2,42 @@
 <map version="1.0" orientation="orthogonal" width="150" height="20" tilewidth="40" tileheight="40">
  <tileset firstgid="1" name="komet_03" tilewidth="40" tileheight="40">
   <image source="komet_03.png" width="40" height="40"/>
+  <tile id="0">
+   <properties>
+    <property name="name" value="komet"/>
+   </properties>
+  </tile>
  </tileset>
  <tileset firstgid="2" name="komet_04" tilewidth="40" tileheight="40">
   <image source="komet_04.png" width="40" height="40"/>
+  <tile id="0">
+   <properties>
+    <property name="name" value="komet"/>
+   </properties>
+  </tile>
  </tileset>
  <tileset firstgid="3" name="komet_01" tilewidth="40" tileheight="40">
   <image source="komet_01.png" width="40" height="40"/>
+  <tile id="0">
+   <properties>
+    <property name="name" value="komet"/>
+   </properties>
+  </tile>
  </tileset>
  <tileset firstgid="4" name="komet_02" tilewidth="40" tileheight="40">
   <image source="komet_02.png" width="40" height="40"/>
+  <tile id="0">
+   <properties>
+    <property name="name" value="komet"/>
+   </properties>
+  </tile>
  </tileset>
  <layer name="Kachelebene 1" width="150" height="20">
   <data encoding="base64" compression="zlib">
    eJzt1kEOwCAIRFFbe/8z16UL08RYFIb/EtOdERBqKdpqW8/gi7g81PBq6x58ERc1PK/vbQ99Dg19b0fo8yx3fzbOLHmxsnr3o+R/Ns4IM0EZ+QdsRZndyhRrwOw+L2MNFHsJ52XsJQAA8C/eqbDAOxUKmI9xea7dyny0jMtqb8+1mD3bzn/bzrxZxmW1t+d3BmfDlxe6ZADT
   </data>
  </layer>
+ <objectgroup name="movables" width="150" height="20">
+  <object name="obj" x="1682" y="368" width="28" height="71"/>
+ </objectgroup>
 </map>

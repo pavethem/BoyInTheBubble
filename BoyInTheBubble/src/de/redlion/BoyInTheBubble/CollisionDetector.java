@@ -1,18 +1,41 @@
 package de.redlion.BoyInTheBubble;
 
 import com.badlogic.gdx.maps.MapLayers;
+import com.badlogic.gdx.maps.MapObject;
+import com.badlogic.gdx.maps.objects.CircleMapObject;
+import com.badlogic.gdx.maps.objects.EllipseMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
+import com.badlogic.gdx.math.Circle;
+import com.badlogic.gdx.math.Ellipse;
+import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.Array;
 
 public class CollisionDetector {
 	
 	Spawner spawner;
 	int lastRow;
+	Array<Circle> circles; 
 	
 	public CollisionDetector(MapLayers layers) {
 		spawner = new Spawner(layers.get("movables"));
 		lastRow = -1;
+		
+		circles = new Array<Circle>(layers.get("collisions").getObjects().getCount());
+		
+		for(MapObject c : layers.get("collisions").getObjects()) {
+			
+			if(c instanceof EllipseMapObject) {
+				EllipseMapObject e = (EllipseMapObject) c;
+				Ellipse el = e.getEllipse();
+				
+				Circle ci = new Circle(el.x / (1/GameScreen.tiled.getUnitScale()), el.y / (1/GameScreen.tiled.getUnitScale()), el.width / (1/GameScreen.tiled.getUnitScale()));
+				
+				circles.add(ci);
+
+			}
+		}
 	}
 
 	public void collisionCheck(Boy boy, TiledMapTileLayer layer, Rectangle viewBounds) {
@@ -24,6 +47,17 @@ public class CollisionDetector {
 			int fromY = (int) (boy.boyBounds.y);
 			int toX = (int) (boy.boyBounds.x + boy.boyBounds.width + viewBounds.x);
 			int toY = (int) (boy.boyBounds.y + boy.boyBounds.height);
+			
+			Rectangle re = new Rectangle(fromX, fromY, toX-fromX, toY-fromY);
+			
+			for (Circle c : circles) {
+				
+				
+				if(boy.bubble.boundingCircle.overlaps(c)) {
+					System.out.println("S!");
+				}
+				
+			}
 			
 //			Vector3 from = new Vector3(boy.boyBounds.x + viewBounds.x,boy.boyBounds.y,0);
 //			Vector3 to = new Vector3(toX,toY,0);
@@ -39,7 +73,8 @@ public class CollisionDetector {
 			for(int x = fromX; x<=toX;x++) {
 				for(int y = fromY; y<=toY;y++) {
 					if(layer.getCell(x, y) != null)
-						boy.isdead = true;
+//						boy.isdead = true;
+						boy.isdead = false;
 				}
 			}
 			

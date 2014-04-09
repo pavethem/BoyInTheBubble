@@ -1,43 +1,71 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.0" orientation="orthogonal" width="150" height="20" tilewidth="40" tileheight="40">
- <tileset firstgid="1" name="komet_03" tilewidth="40" tileheight="40">
-  <image source="komet_03.png" width="40" height="40"/>
-  <tile id="0">
-   <properties>
-    <property name="name" value="komet"/>
-   </properties>
-  </tile>
- </tileset>
- <tileset firstgid="2" name="komet_04" tilewidth="40" tileheight="40">
-  <image source="komet_04.png" width="40" height="40"/>
-  <tile id="0">
-   <properties>
-    <property name="name" value="komet"/>
-   </properties>
-  </tile>
- </tileset>
- <tileset firstgid="3" name="komet_01" tilewidth="40" tileheight="40">
-  <image source="komet_01.png" width="40" height="40"/>
-  <tile id="0">
-   <properties>
-    <property name="name" value="komet"/>
-   </properties>
-  </tile>
- </tileset>
- <tileset firstgid="4" name="komet_02" tilewidth="40" tileheight="40">
-  <image source="komet_02.png" width="40" height="40"/>
-  <tile id="0">
-   <properties>
-    <property name="name" value="komet"/>
-   </properties>
-  </tile>
- </tileset>
- <layer name="Kachelebene 1" width="150" height="20">
+ <tileset firstgid="1" source="komet.tsx"/>
+ <layer name="Fringe" width="150" height="20">
   <data encoding="base64" compression="zlib">
-   eJzt1kEOwCAIRFFbe/8z16UL08RYFIb/EtOdERBqKdpqW8/gi7g81PBq6x58ERc1PK/vbQ99Dg19b0fo8yx3fzbOLHmxsnr3o+R/Ns4IM0EZ+QdsRZndyhRrwOw+L2MNFHsJ52XsJQAA8C/eqbDAOxUKmI9xea7dyny0jMtqb8+1mD3bzn/bzrxZxmW1t+d3BmfDlxe6ZADT
+   eJzt1WEOgCAIhmFrdf8r5wXcQANE3mfzX27Q+LA1oJarnzu6iJ9F9HTifxyR9Pr08zrU4imipxP/44h1r9KMVsoy1knntlKWsS/2Gyyw36DFLoIFdtEc8ggL5BGI47nXeUPq8NzrvCEAMuEthAXewnWz2dTcy5j/jDXvZDabmnsZ829VM/MKC9p51c4hcwsJ7RyOvv8A/8IA5Q==
   </data>
  </layer>
  <objectgroup name="movables" width="150" height="20">
-  <object name="obj" x="1682" y="368" width="28" height="71"/>
+  <object name="obj" x="1693" y="159" width="28" height="71"/>
+ </objectgroup>
+ <objectgroup name="collisions" width="150" height="20">
+  <object x="1560" y="40" width="80" height="80">
+   <ellipse/>
+  </object>
+  <object x="3680" y="40" width="80" height="80">
+   <ellipse/>
+  </object>
+  <object x="4840" y="40" width="80" height="80">
+   <ellipse/>
+  </object>
+  <object x="1200" y="80" width="80" height="80">
+   <ellipse/>
+  </object>
+  <object x="2160" y="120" width="80" height="80">
+   <ellipse/>
+  </object>
+  <object x="2560" y="120" width="80" height="80">
+   <ellipse/>
+  </object>
+  <object x="3040" y="200" width="80" height="80">
+   <ellipse/>
+  </object>
+  <object x="2680" y="280" width="80" height="80">
+   <ellipse/>
+  </object>
+  <object x="5800" y="320" width="80" height="80">
+   <ellipse/>
+  </object>
+  <object x="2760" y="440" width="80" height="80">
+   <ellipse/>
+  </object>
+  <object x="3840" y="440" width="80" height="80">
+   <ellipse/>
+  </object>
+  <object x="3880" y="560" width="80" height="80">
+   <ellipse/>
+  </object>
+  <object x="1120" y="640" width="80" height="80">
+   <ellipse/>
+  </object>
+  <object x="1680" y="640" width="80" height="80">
+   <ellipse/>
+  </object>
+  <object x="2120" y="640" width="80" height="80">
+   <ellipse/>
+  </object>
+  <object x="3920" y="640" width="80" height="80">
+   <ellipse/>
+  </object>
+  <object x="4800" y="680" width="80" height="80">
+   <ellipse/>
+  </object>
+  <object x="5280" y="720" width="80" height="80">
+   <ellipse/>
+  </object>
+  <object x="5760" y="720" width="80" height="80">
+   <ellipse/>
+  </object>
  </objectgroup>
 </map>

@@ -13,13 +13,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Matrix4;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.physics.box2d.Body;
-import com.badlogic.gdx.physics.box2d.BodyDef;
-import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
-import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
-import com.badlogic.gdx.physics.box2d.ChainShape;
 import com.badlogic.gdx.physics.box2d.World;
 
 public class GameScreen implements ApplicationListener {
@@ -193,12 +187,12 @@ public class GameScreen implements ApplicationListener {
 			} else {
 				splitRotation -= delta * ROTATION_MULTIPLIER;
 			}
-			camera.translate(delta * 2, 0);
-			camera.update();
+//			camera.translate(delta * 2, 0);
+//			camera.update();
 			tiled.setView(camera);
 //			debugRenderer.render(world, boyCam.combined.cpy().scale(Constants.PIXELS_PER_METER, Constants.PIXELS_PER_METER, 0));
 		}
-//		tiled.render();
+		tiled.render();
 		
 		if(boy.isSplit) {
 			splitBoy1.normalBoy.setRotation(boyRotation);
@@ -223,7 +217,7 @@ public class GameScreen implements ApplicationListener {
 			}
 		}
 		
-//		collisionDetector.collisionCheck(boy, layer, tiled.getViewBounds());
+		collisionDetector.collisionCheck(boy, layer, tiled.getViewBounds());
 		
 		if(!boy.isdead) {
 			
@@ -513,10 +507,27 @@ public class GameScreen implements ApplicationListener {
 
 	@Override
 	public void resize(int width, int height) {
+		float w = Gdx.graphics.getWidth();
+		float h = Gdx.graphics.getHeight();
+		
+		temp = new Matrix4();
+		model = new Matrix4();
+		
+		camera = new OrthographicCamera(1, h/w);
+		boyCam = new OrthographicCamera(1, h/w);
+		batch = new SpriteBatch();
+		
+		tiled = new OrthogonalTiledMapRenderer(Resources.getInstance().map,1/40f);
+		camera.setToOrtho(false, 32, 20);
+		boyCam.setToOrtho(false, 32, 20);
+		tiled.setView(camera);
 		boy.normalBoy.setOrigin(boy.normalBoy.getWidth()/2, boy.normalBoy.getHeight()/2);
 		boy.normalBoy.setPosition(camera.viewportWidth / 4, camera.viewportHeight / 2);
 		middle.setOrigin(middle.getWidth()/2, middle.getHeight()/2);
 		middle.setPosition(width/4,height/2);	
+		
+		camController = new OrthoCamController(boyCam);
+		Gdx.input.setInputProcessor(camController);
 	}
 
 	@Override
