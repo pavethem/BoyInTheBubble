@@ -9,6 +9,7 @@ import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Ellipse;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 
@@ -30,12 +31,27 @@ public class CollisionDetector {
 				EllipseMapObject e = (EllipseMapObject) c;
 				Ellipse el = e.getEllipse();
 				
-				Circle ci = new Circle(el.x / (1/GameScreen.tiled.getUnitScale()), el.y / (1/GameScreen.tiled.getUnitScale()), el.width / (1/GameScreen.tiled.getUnitScale()));
+				float width = el.width;
+				float x = el.x + width / 2;
+				float y = el.y + width / 2;
+				
+				Circle ci = new Circle(x / (1/GameScreen.tiled.getUnitScale()), y / (1/GameScreen.tiled.getUnitScale()), el.width / (2/GameScreen.tiled.getUnitScale()));
 				
 				circles.add(ci);
 
 			}
 		}
+	}
+	
+	public boolean bubbleCheck(Circle boundingCircle, Vector2 pos) {
+		
+		for (Circle c : circles) {
+			if(boundingCircle.overlaps(c)) {
+				if(c.contains(pos))
+					return true;
+			}
+		}
+		return false;
 	}
 
 	public void collisionCheck(Boy boy, TiledMapTileLayer layer, Rectangle viewBounds) {
@@ -48,16 +64,17 @@ public class CollisionDetector {
 			int toX = (int) (boy.boyBounds.x + boy.boyBounds.width + viewBounds.x);
 			int toY = (int) (boy.boyBounds.y + boy.boyBounds.height);
 			
-			Rectangle re = new Rectangle(fromX, fromY, toX-fromX, toY-fromY);
+//			for (Circle c : circles) {
+//				if(boy.boundingCircle.overlaps(c)) {
+//					boy.isdead = false;
+//				}
+//			}
 			
-			for (Circle c : circles) {
-				
-				
-				if(boy.bubble.boundingCircle.overlaps(c)) {
-					System.out.println("S!");
-				}
-				
+			for (int i = 0; i < boy.bubble.circles.size; i++) {
+				if(boy.bubble.circles.get(i).dst(boy.bubble.center) < boy.collisionSize / 2)
+					boy.isdead = true;
 			}
+
 			
 //			Vector3 from = new Vector3(boy.boyBounds.x + viewBounds.x,boy.boyBounds.y,0);
 //			Vector3 to = new Vector3(toX,toY,0);
@@ -70,13 +87,13 @@ public class CollisionDetector {
 //							r.rect(from.x, from.y, 240,240);
 //							r.end();
 			
-			for(int x = fromX; x<=toX;x++) {
-				for(int y = fromY; y<=toY;y++) {
-					if(layer.getCell(x, y) != null)
-//						boy.isdead = true;
-						boy.isdead = false;
-				}
-			}
+//			for(int x = fromX; x<=toX;x++) {
+//				for(int y = fromY; y<=toY;y++) {
+//					if(layer.getCell(x, y) != null)
+////						boy.isdead = true;
+//						boy.isdead = false;
+//				}
+//			}
 			
 			if(boy.hasTail) {
 				for(Vector3 p : boy.positions) {

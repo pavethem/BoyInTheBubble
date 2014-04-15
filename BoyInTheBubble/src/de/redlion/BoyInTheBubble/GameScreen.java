@@ -52,7 +52,7 @@ public class GameScreen implements ApplicationListener {
 	float splitRotation = 0;
 	final float ROTATION_MULTIPLIER = 20;
 	
-	CollisionDetector collisionDetector;
+	public static CollisionDetector collisionDetector;
 	
 	public static World world;
 //	Box2DDebugRenderer debugRenderer;
@@ -156,6 +156,28 @@ public class GameScreen implements ApplicationListener {
 //		world.step(delta, 60, 20);
 //		world.clearForces();
 		
+		//debug circles of comets
+//		r.begin(ShapeType.Line);
+//		for(Circle c : collisionDetector.circles) {
+//			r.circle(c.x * 40, c.y * 40, c.radius * 40);
+//		}
+//		r.end();
+		
+		if(!boy.isdead) {
+			if(!boy.isSplit && splitBoy1.split_dist <= 0) {
+				boyRotation -= delta * ROTATION_MULTIPLIER;
+				splitRotation = boyRotation;
+			} else {
+				splitRotation -= delta * ROTATION_MULTIPLIER;
+			}
+//			camera.translate(delta * 2, 0);
+//			camera.update();
+			tiled.setView(camera);
+//			debugRenderer.render(world, boyCam.combined.cpy().scale(Constants.PIXELS_PER_METER, Constants.PIXELS_PER_METER, 0));
+		}
+		tiled.render();
+		
+		
 		// render bubble
 		r.begin(ShapeType.Line);
 		r.setColor(0, 0, 0, 1);
@@ -179,20 +201,6 @@ public class GameScreen implements ApplicationListener {
 			}
 		}
 		r.end();
-		
-		if(!boy.isdead) {
-			if(!boy.isSplit && splitBoy1.split_dist <= 0) {
-				boyRotation -= delta * ROTATION_MULTIPLIER;
-				splitRotation = boyRotation;
-			} else {
-				splitRotation -= delta * ROTATION_MULTIPLIER;
-			}
-//			camera.translate(delta * 2, 0);
-//			camera.update();
-			tiled.setView(camera);
-//			debugRenderer.render(world, boyCam.combined.cpy().scale(Constants.PIXELS_PER_METER, Constants.PIXELS_PER_METER, 0));
-		}
-		tiled.render();
 		
 		if(boy.isSplit) {
 			splitBoy1.normalBoy.setRotation(boyRotation);

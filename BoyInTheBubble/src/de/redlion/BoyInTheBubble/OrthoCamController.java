@@ -53,6 +53,7 @@ public class OrthoCamController extends InputAdapter {
 			normalBoy = GameScreen.boy.normalBoy.getBoundingRectangle();
 			
 			GameScreen.boy.normalBoy.setPosition(newPos.x , newPos.y );
+			GameScreen.boy.boundingCircle.setPosition(newPos.x + GameScreen.boy.getOrigin().x, newPos.y + GameScreen.boy.getOrigin().y);
 			GameScreen.boy.bubble.updateTarget(newPos.x,newPos.y);
 			
 			delta = last.dst(new Vector2(x, y));

@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
@@ -15,6 +16,7 @@ public class Boy {
 	public Array<Sprite> boySprites;
 	public Sprite normalBoy;
 	public Rectangle boyBounds;
+	public Circle boundingCircle;
 	public Animation death;
 	public boolean isdead;
 	public boolean isfinished;
@@ -24,6 +26,7 @@ public class Boy {
 	public float split_dist;
 //	public float sizeModifier;
 	
+	public float collisionSize = 2.5f; //have a small margin before the bubble bursts
 	public float originalSize = 3f; // macht 120px
 	public float bubbleSize = 3.3f; // bisschen größer
 	public int size = 120;
@@ -67,6 +70,8 @@ public class Boy {
 		
 		if(createBubble)
 			bubble = new Bubble2D(bubbleSize, getCorrectedPosition());
+		
+		boundingCircle = new Circle(-getCorrectedPosition().x, -getCorrectedPosition().y, collisionSize / 2);
 	}
 
 	public Vector3 getCorrectedPosition() {

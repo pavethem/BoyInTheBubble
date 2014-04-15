@@ -13,7 +13,7 @@ public class Bubble2D {
 	
 	Vector2 center;
 	Array<Vector2> circles;
-	Circle boundingCircle;
+	Circle bubbleCircle;
 	
 	float dist;
 	
@@ -37,7 +37,7 @@ public class Bubble2D {
 	        circles.add(position);
 		}
 		
-		boundingCircle = new Circle(center, dist);
+		bubbleCircle = new Circle(center, dist);
 		
 	}
 	
@@ -47,7 +47,7 @@ public class Bubble2D {
 		y += GameScreen.boy.getOrigin().y;
 		
 		center.set(x, y);
-		boundingCircle.setPosition(center);
+		bubbleCircle.setPosition(center);
 		
 		for(int i=0;i<NUM_SEGMENTS;i++){
 			boolean toucheswall = false;
@@ -73,20 +73,29 @@ public class Bubble2D {
 			
 			x = MathUtils.cosDeg(360/NUM_SEGMENTS*i) * dist;
 	        y = MathUtils.sinDeg(360/NUM_SEGMENTS*i) * dist;
+	        
+	        float cx = circles.get(i).x;
+	        float cy = circles.get(i).y;
+	        
+	        boolean collides = GameScreen.collisionDetector.bubbleCheck(bubbleCircle, center.cpy().add(x,y));
+	        
+			//check for collisions with objects
+	        if(!collides) {
+	        	circles.get(i).set(center.cpy().add(x,y));
+			}
 
-			if(!toucheswall)
-				circles.get(i).set(center.cpy().add(x,y));
-			else {
+			if(toucheswall){
 				if(touchesleftright) {
-					x = circles.get(i).x;
+					x = cx;
 					y = center.cpy().add(x,y).y;
 				}
 				else if (touchestopbottom) {
 					x = center.cpy().add(x,y).x;
-					y = circles.get(i).y;
+					y = cy;
 				}
 				circles.get(i).set(x,y);
 			}
+			
 		}
 	}
 }
