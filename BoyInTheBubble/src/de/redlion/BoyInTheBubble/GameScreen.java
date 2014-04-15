@@ -181,21 +181,21 @@ public class GameScreen implements ApplicationListener {
 		// render bubble
 		r.begin(ShapeType.Line);
 		r.setColor(0, 0, 0, 1);
-		for (int i = 0; i < boy.bubble.circles.size - 1; i++) {
+		for (int i = 0; i < boy.bubble.grads.size - 1; i++) {
 			Vector3 temp1 = new Vector3();
-			temp1.set(boy.bubble.circles.get(i).x, boy.bubble.circles.get(i).y,
+			temp1.set(boy.bubble.grads.get(i).x, boy.bubble.grads.get(i).y,
 					0);
 			boyCam.project(temp1);
 			Vector3 temp2 = new Vector3();
-			temp2.set(boy.bubble.circles.get(i + 1).x,
-					boy.bubble.circles.get(i + 1).y, 0);
+			temp2.set(boy.bubble.grads.get(i + 1).x,
+					boy.bubble.grads.get(i + 1).y, 0);
 			boyCam.project(temp2);
 
 			r.line(temp1, temp2);
 
-			if (i + 1 == boy.bubble.circles.size - 1) {
-				temp1.set(boy.bubble.circles.get(0).x,
-						boy.bubble.circles.get(0).y, 0);
+			if (i + 1 == boy.bubble.grads.size - 1) {
+				temp1.set(boy.bubble.grads.get(0).x,
+						boy.bubble.grads.get(0).y, 0);
 				boyCam.project(temp1);
 				r.line(temp2, temp1);
 			}

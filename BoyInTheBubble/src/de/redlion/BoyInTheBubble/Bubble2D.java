@@ -12,7 +12,7 @@ public class Bubble2D {
 	final int NUM_SEGMENTS = 24;
 	
 	Vector2 center;
-	Array<Vector2> circles;
+	Array<Vector2> grads;
 	Circle bubbleCircle;
 	
 	float dist;
@@ -25,7 +25,7 @@ public class Bubble2D {
 		distance/=2;
 		dist = distance;
 		
-		circles = new Array<Vector2>();
+		grads = new Array<Vector2>();
 		
 		center = new Vector2(-pos.x, -pos.y);
 		
@@ -34,7 +34,7 @@ public class Bubble2D {
 	        float y = MathUtils.sinDeg(360/NUM_SEGMENTS*i) * distance;
 	        
 	        Vector2 position = new Vector2(center.cpy().add(x, y));
-	        circles.add(position);
+	        grads.add(position);
 		}
 		
 		bubbleCircle = new Circle(center, dist);
@@ -53,18 +53,18 @@ public class Bubble2D {
 			boolean toucheswall = false;
 			
 			boolean touchesleftright = false;
-			if(circles.get(i).x <= 0.1f || circles.get(i).x >= camWidth -0.1f) {
+			if(grads.get(i).x <= 0.1f || grads.get(i).x >= camWidth -0.1f) {
 				touchesleftright = true;
 				toucheswall = true;
 			}
 			boolean touchestopbottom = false;
-			if(circles.get(i).y <= 0.1f || circles.get(i).y >= camHeight-0.1f) {
+			if(grads.get(i).y <= 0.1f || grads.get(i).y >= camHeight-0.1f) {
 				touchestopbottom = true;
 				toucheswall = true;
 			}
 			
 			if(toucheswall) {
-				if(circles.get(i).dst(center) >= dist) {
+				if(grads.get(i).dst(center) >= dist) {
 					toucheswall = false;
 					touchesleftright = false;
 					touchestopbottom = false;
@@ -74,14 +74,14 @@ public class Bubble2D {
 			x = MathUtils.cosDeg(360/NUM_SEGMENTS*i) * dist;
 	        y = MathUtils.sinDeg(360/NUM_SEGMENTS*i) * dist;
 	        
-	        float cx = circles.get(i).x;
-	        float cy = circles.get(i).y;
+	        float cx = grads.get(i).x;
+	        float cy = grads.get(i).y;
 	        
 	        boolean collides = GameScreen.collisionDetector.bubbleCheck(bubbleCircle, center.cpy().add(x,y));
 	        
 			//check for collisions with objects
 	        if(!collides) {
-	        	circles.get(i).set(center.cpy().add(x,y));
+	        	grads.get(i).set(center.cpy().add(x,y));
 			}
 
 			if(toucheswall){
@@ -93,7 +93,7 @@ public class Bubble2D {
 					x = center.cpy().add(x,y).x;
 					y = cy;
 				}
-				circles.get(i).set(x,y);
+				grads.get(i).set(x,y);
 			}
 			
 		}

@@ -70,8 +70,8 @@ public class CollisionDetector {
 //				}
 //			}
 			
-			for (int i = 0; i < boy.bubble.circles.size; i++) {
-				if(boy.bubble.circles.get(i).dst(boy.bubble.center) < boy.collisionSize / 2)
+			for (int i = 0; i < boy.bubble.grads.size; i++) {
+				if(boy.bubble.grads.get(i).dst(boy.bubble.center) < boy.collisionSize / 2)
 					boy.isdead = true;
 			}
 
