@@ -232,28 +232,40 @@ public class GameScreen implements ApplicationListener {
 			Vector3 position = boy.getCorrectedPosition();
 			
 			if (boy.size > boy.targetSize) {
-				boy.size -= Gdx.graphics.getDeltaTime();
-				if(boy.isSmall)
-					boy.normalBoy.setSize(((float)boy.size/boy.targetSize)*boy.smallSize, ((float)boy.size/boy.targetSize)*boy.smallSize);
-				else
-					boy.normalBoy.setSize(((float)boy.size/boy.targetSize)*boy.originalSize, ((float)boy.size/boy.targetSize)*boy.originalSize);
-				
-				boy.normalBoy.setOrigin(boy.normalBoy.getWidth()/2,boy.normalBoy.getHeight()/2 );
+
+				boy.normalBoy.scale(-delta);
+				boy.size = boy.normalBoy.getScaleX() * boy.originalSize;
+
+//				boy.normalBoy.setOrigin(boy.size / 2, boy.size / 2);
+//				float offset = (boy.size - boy.targetSize) /2;
+//				offset/=20;
+//				System.out.println(offset);
+//				boy.normalBoy.setPosition(boy.normalBoy.getX()+offset, boy.normalBoy.getY()+offset);
 			}
 			else if(boy.size < boy.targetSize) {
-				boy.size += Gdx.graphics.getDeltaTime() * 100;
-				if(boy.isBig)
-					boy.normalBoy.setSize(((float)boy.size/boy.targetSize)*boy.bigSize, ((float)boy.size/boy.targetSize)*boy.bigSize);
-				else
-					boy.normalBoy.setSize(((float)boy.size/boy.targetSize)*boy.originalSize, ((float)boy.size/boy.targetSize)*boy.originalSize);
+				boy.normalBoy.scale(delta);
+				boy.size = boy.normalBoy.getScaleX() * boy.originalSize;
 				
-				boy.normalBoy.setOrigin(boy.normalBoy.getWidth()/2,boy.normalBoy.getHeight()/2 );
+//				boy.normalBoy.setOrigin(boy.size / 2, boy.size / 2);
+//				float offset = (boy.targetSize - boy.size) /2;
+//				offset/=20;
+//				System.out.println(offset);
+//				boy.normalBoy.setPosition(boy.normalBoy.getX()-offset, boy.normalBoy.getY()-offset);
+			}
+			
+			if(Math.abs(boy.targetSize-boy.size) < 0.1f) {
+				boy.size = boy.targetSize;
+//				boy.normalBoy.setOrigin(boy.size / 2, boy.size / 2);
+//				float offset = (boy.targetSize - boy.size) /2;
+//				offset/=20;
+//				System.out.println(offset);
+//				boy.normalBoy.setPosition(boy.normalBoy.getX()-offset, boy.normalBoy.getY()-offset);
 			}
 			
 			if(!boy.isSplit && splitBoy1.split_dist <= 0) {
 				model.idt();
 				temp.idt();
-//				temp.setToScaling(boy.targetSize/boy.size, boy.targetSize/boy.size, 0);
+//				temp.setToScaling(boy.normalBoy.getScaleX(),boy.normalBoy.getScaleY(),0);
 //				model.mul(temp);
 				temp.setToTranslation(-position.x,-position.y,0);
 				model.mul(temp);

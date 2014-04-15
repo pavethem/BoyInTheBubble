@@ -29,8 +29,8 @@ public class Boy {
 	public float collisionSize = 2.5f; //have a small margin before the bubble bursts
 	public float originalSize = 3f; // macht 120px
 	public float bubbleSize = 3.3f; // bisschen größer
-	public int size = 120;
-	public int targetSize = 120;
+	public float size = originalSize;
+	public float targetSize = originalSize;
 	public float smallSize = 1.5f;
 	public float bigSize = 5f;
 	
@@ -83,6 +83,10 @@ public class Boy {
 		return new Vector3(normalBoy.getX(),normalBoy.getY(),0);
 	}
 	
+	public float getSize() {
+		return size * (1/GameScreen.tiled.getUnitScale());
+	}
+	
 
 	public Vector2 getOrigin() {
 		return new Vector2(normalBoy.getOriginX(),normalBoy.getOriginY());
@@ -116,9 +120,9 @@ public class Boy {
 		isSmall = false;
 		
 		if(isBig)
-			targetSize = 200;
+			targetSize = bigSize;
 		else
-			targetSize = 120;
+			targetSize = originalSize;
 
 		return isBig;
 	}
@@ -128,10 +132,10 @@ public class Boy {
 		isBig = false;
 		
 		if(isSmall) {
-			targetSize = 60;
+			targetSize = smallSize;
 		}
 		else {
-			targetSize = 120;
+			targetSize = originalSize;
 		}
 		
 		return isSmall;

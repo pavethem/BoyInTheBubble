@@ -40,7 +40,7 @@ public class OrthoCamController extends InputAdapter {
 			
 		if(touched) {
 			
-			float size =  GameScreen.boy.size;
+			float size =  GameScreen.boy.originalSize * (1/GameScreen.tiled.getUnitScale());
 			
 			int correctedX = (int) (x - size/2 - screenOffsetX);
 			int correctedY = (int) (y + size/2 + screenOffsetY);
@@ -50,7 +50,6 @@ public class OrthoCamController extends InputAdapter {
 			
 			Vector3 newPos = new Vector3(correctedX, correctedY,0);		
 			camera.unproject(newPos);
-			normalBoy = GameScreen.boy.normalBoy.getBoundingRectangle();
 			
 			GameScreen.boy.normalBoy.setPosition(newPos.x , newPos.y );
 			GameScreen.boy.boundingCircle.setPosition(newPos.x + GameScreen.boy.getOrigin().x, newPos.y + GameScreen.boy.getOrigin().y);
@@ -83,9 +82,9 @@ public class OrthoCamController extends InputAdapter {
 		
 		camera.project(pos);
 		
-		float w = GameScreen.boy.size;
-
-		float h = GameScreen.boy.size;
+		float w = GameScreen.boy.getSize();
+		
+		float h = GameScreen.boy.getSize();
 		
 		Rectangle box = new Rectangle(pos.x, pos.y, w,h);
 		
@@ -98,10 +97,10 @@ public class OrthoCamController extends InputAdapter {
 //			else if(GameScreen.boy.isSmall)
 //				sizemod = 1.5f - GameScreen.boy.normalBoy.getWidth();
 			
-			float centerX = normalBoy.getX() + normalBoy.getWidth() / 2;
-			float screenCenterX = box.x + (w) / 2;
-			float centerY = normalBoy.getY() - normalBoy.getHeight()/2;
-			float screenCenterY = box.y + (h) / 2;
+			float centerX = GameScreen.boy.getPosition().x + GameScreen.boy.size / 2;
+			float screenCenterX = box.x + (w / 2);
+			float centerY = GameScreen.boy.getPosition().y - GameScreen.boy.size /2;
+			float screenCenterY = box.y + (h / 2);
 			
 			if(centerX > newPos.x) {
 				offsetX = -centerX + newPos.x;
@@ -120,10 +119,8 @@ public class OrthoCamController extends InputAdapter {
 				screenOffsetY = y - screenCenterY;
 			}
 			
-			
-			
-			newPos.x -= GameScreen.boy.getOrigin().x;
-			newPos.y += GameScreen.boy.getOrigin().y;
+			newPos.x -= GameScreen.boy.size / 2;
+			newPos.y += GameScreen.boy.size / 2;
 			
 			GameScreen.boy.normalBoy.setPosition(newPos.x -offsetX , newPos.y -offsetY);
 //			last.set(x,y);
