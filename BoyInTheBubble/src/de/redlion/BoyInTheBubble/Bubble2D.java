@@ -41,6 +41,23 @@ public class Bubble2D {
 		
 	}
 	
+	public void scale(float newSize) {
+		dist = newSize / 2;
+		
+		grads = new Array<Vector2>();	
+		
+		for(int i=0;i<NUM_SEGMENTS;i++){
+	        float x = MathUtils.cosDeg(360/NUM_SEGMENTS*i) * dist;
+	        float y = MathUtils.sinDeg(360/NUM_SEGMENTS*i) * dist;
+	        
+	        Vector2 position = new Vector2(center.cpy().add(x, y));
+	        grads.add(position);
+		}
+		
+		bubbleCircle = new Circle(center, dist);
+		
+	}
+	
 	public void updateTarget(float x, float y) {
 		
 		x += GameScreen.boy.getOrigin().x;

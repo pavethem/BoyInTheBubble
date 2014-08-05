@@ -70,10 +70,10 @@ public class CollisionDetector {
 //				}
 //			}
 			
-			for (int i = 0; i < boy.bubble.grads.size; i++) {
-				if(boy.bubble.grads.get(i).dst(boy.bubble.center) < boy.collisionSize / 2)
-					boy.isdead = true;
-			}
+//			for (int i = 0; i < boy.bubble.grads.size; i++) {
+//				if(boy.bubble.grads.get(i).dst(boy.bubble.center) < boy.collisionSize / 2)
+//					boy.isdead = true;
+//			}
 
 			
 //			Vector3 from = new Vector3(boy.boyBounds.x + viewBounds.x,boy.boyBounds.y,0);

@@ -235,6 +235,10 @@ public class GameScreen implements ApplicationListener {
 
 				boy.normalBoy.scale(-delta);
 				boy.size = boy.normalBoy.getScaleX() * boy.originalSize;
+				boy.collisionSize = (boy.size * 80) / 100;
+
+				boy.bubbleSize = boy.size + 0.3f;
+				boy.bubble.scale(boy.bubbleSize);
 
 //				boy.normalBoy.setOrigin(boy.size / 2, boy.size / 2);
 //				float offset = (boy.size - boy.targetSize) /2;
@@ -245,6 +249,10 @@ public class GameScreen implements ApplicationListener {
 			else if(boy.size < boy.targetSize) {
 				boy.normalBoy.scale(delta);
 				boy.size = boy.normalBoy.getScaleX() * boy.originalSize;
+				boy.collisionSize = (boy.size * 80) / 100;
+
+				boy.bubbleSize = boy.size + 0.3f;
+				boy.bubble.scale(boy.bubbleSize);
 				
 //				boy.normalBoy.setOrigin(boy.size / 2, boy.size / 2);
 //				float offset = (boy.targetSize - boy.size) /2;
@@ -255,6 +263,8 @@ public class GameScreen implements ApplicationListener {
 			
 			if(Math.abs(boy.targetSize-boy.size) < 0.1f) {
 				boy.size = boy.targetSize;
+				boy.collisionSize = (boy.size * 80) / 100;
+				
 //				boy.normalBoy.setOrigin(boy.size / 2, boy.size / 2);
 //				float offset = (boy.targetSize - boy.size) /2;
 //				offset/=20;
