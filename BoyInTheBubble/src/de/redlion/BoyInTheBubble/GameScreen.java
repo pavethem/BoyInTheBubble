@@ -17,13 +17,16 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.World;
 
 public class GameScreen implements ApplicationListener {
+	//cam used for tile stuff
 	private OrthographicCamera camera;
+	//cam stays on boy
 	private OrthographicCamera boyCam;
 	static OrthogonalTiledMapRenderer tiled;
 	private SpriteBatch batch;
 	
 	private TiledMapTileLayer layer;
 
+	//for dying animation
 	private float stateTime;
 	
 	public static Boy boy;
@@ -35,7 +38,7 @@ public class GameScreen implements ApplicationListener {
 	Sprite blackFade;
 	SpriteBatch fadeBatch;
 	
-	float startTime = 0;
+//	float startTime = 0;
 	float fade = 1.0f;
 	boolean finished = false;
 
@@ -44,6 +47,7 @@ public class GameScreen implements ApplicationListener {
 	Matrix4 temp;
 	Matrix4 model;
 	
+	//Touch controller
 	OrthoCamController camController;
 	
 	Vector3 lastPosition;
@@ -54,7 +58,7 @@ public class GameScreen implements ApplicationListener {
 	
 	public static CollisionDetector collisionDetector;
 	
-	public static World world;
+//	public static World world;
 //	Box2DDebugRenderer debugRenderer;
 	
 	ShapeRenderer r;
@@ -75,7 +79,9 @@ public class GameScreen implements ApplicationListener {
 		boyCam = new OrthographicCamera(1, h/w);
 		batch = new SpriteBatch();
 		
+		//measurement is 1 tile = 40x40 px
 		tiled = new OrthogonalTiledMapRenderer(Resources.getInstance().map,1/40f);
+		//32x20 tiles on the screen
 		camera.setToOrtho(false, 32, 20);
 		boyCam.setToOrtho(false, 32, 20);
 		tiled.setView(camera);
@@ -165,6 +171,7 @@ public class GameScreen implements ApplicationListener {
 		
 		if(!boy.isdead) {
 			if(!boy.isSplit && splitBoy1.split_dist <= 0) {
+				//rotate boy
 				boyRotation -= delta * ROTATION_MULTIPLIER;
 				splitRotation = boyRotation;
 			} else {
@@ -229,14 +236,27 @@ public class GameScreen implements ApplicationListener {
 		
 		if(!boy.isdead) {
 			
+			//DEBUG BOY POSITION
+//			Vector3 yob = boy.getPosition().cpy();
+//			yob.x += tiled.getViewBounds().x;
+//			yob.z = 0;
+//			camera.project(yob);
+//			r.begin(ShapeType.Line);
+//			r.setColor(1,0,0,1);
+//			r.circle(yob.x -40, yob.y -40, 2);
+//			r.end();
+			
 			Vector3 position = boy.getCorrectedPosition();
 			
+			//shrink in size
 			if (boy.size > boy.targetSize) {
 
 				boy.normalBoy.scale(-delta);
 				boy.size = boy.normalBoy.getScaleX() * boy.originalSize;
+				//80% of actual size
 				boy.collisionSize = (boy.size * 80) / 100;
 
+				//bubble is a little bigger than boy
 				boy.bubbleSize = boy.size + 0.3f;
 				boy.bubble.scale(boy.bubbleSize);
 
@@ -246,11 +266,14 @@ public class GameScreen implements ApplicationListener {
 //				System.out.println(offset);
 //				boy.normalBoy.setPosition(boy.normalBoy.getX()+offset, boy.normalBoy.getY()+offset);
 			}
+			//grow in size
 			else if(boy.size < boy.targetSize) {
 				boy.normalBoy.scale(delta);
 				boy.size = boy.normalBoy.getScaleX() * boy.originalSize;
+				//80% of actual size
 				boy.collisionSize = (boy.size * 80) / 100;
 
+				//bubble is a little bigger than boy
 				boy.bubbleSize = boy.size + 0.3f;
 				boy.bubble.scale(boy.bubbleSize);
 				
@@ -261,8 +284,10 @@ public class GameScreen implements ApplicationListener {
 //				boy.normalBoy.setPosition(boy.normalBoy.getX()-offset, boy.normalBoy.getY()-offset);
 			}
 			
+			//correct measurements after growth/shrinking
 			if(Math.abs(boy.targetSize-boy.size) < 0.1f) {
 				boy.size = boy.targetSize;
+				//80% of actual size
 				boy.collisionSize = (boy.size * 80) / 100;
 				
 //				boy.normalBoy.setOrigin(boy.size / 2, boy.size / 2);
@@ -272,6 +297,7 @@ public class GameScreen implements ApplicationListener {
 //				boy.normalBoy.setPosition(boy.normalBoy.getX()-offset, boy.normalBoy.getY()-offset);
 			}
 			
+			//normal boy // tail boy stuff
 			if(!boy.isSplit && splitBoy1.split_dist <= 0) {
 				model.idt();
 				temp.idt();
@@ -291,6 +317,7 @@ public class GameScreen implements ApplicationListener {
 					}
 				}
 				
+				//draw boy
 				batch.setProjectionMatrix(boyCam.combined);
 				batch.begin();
 				batch.setTransformMatrix(model);
@@ -316,6 +343,7 @@ public class GameScreen implements ApplicationListener {
 					}
 				}
 			}
+			//split boy
 			else if(boy.isSplit || splitBoy1.split_dist >= 0) {
 				
 				//render middle
@@ -403,6 +431,7 @@ public class GameScreen implements ApplicationListener {
 			}
 		}
 		
+		//play death animation of splitboy1
 		if(splitBoy1.isdead) {
 			stateTime += delta;
 //			currentFrame = boy.getCurrentFrame(stateTime);
@@ -438,6 +467,7 @@ public class GameScreen implements ApplicationListener {
 			}
 		}
 		
+		//play death animation of splitboy2
 		if(splitBoy2.isdead) {
 			stateTime += delta;
 //			currentFrame = boy.getCurrentFrame(stateTime);
@@ -495,6 +525,7 @@ public class GameScreen implements ApplicationListener {
 			deadBoy.draw(batch);
 			batch.end();
 			
+			//play animation and boy moves out of screen downwards
 			if(boy.isfinished) {
 				float y = boy.getPosition().y;
 				y -= 0.25f;

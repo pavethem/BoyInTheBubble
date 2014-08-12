@@ -40,16 +40,18 @@ public class OrthoCamController extends InputAdapter {
 			
 		if(touched) {
 			
-			
-			//TODO: fix clamp on walls
-			
-			float size =  GameScreen.boy.getOriginalSize();
+			float size =  GameScreen.boy.getSize();
 			
 			int correctedX = (int) (x - size/2 - screenOffsetX);
 			int correctedY = (int) (y + size/2 + screenOffsetY);
 
 			correctedX = (int) MathUtils.clamp(correctedX, 0, Gdx.graphics.getWidth() - size);
 			correctedY = (int) MathUtils.clamp(correctedY, size, Gdx.graphics.getHeight());
+			
+			if(GameScreen.boy.isBig) {
+				correctedX += (GameScreen.boy.getSize() - GameScreen.boy.getOriginalSize()) / 2;
+				correctedY -= (GameScreen.boy.getSize() - GameScreen.boy.getOriginalSize()) / 2;
+			}
 			
 			Vector3 newPos = new Vector3(correctedX, correctedY,0);		
 			camera.unproject(newPos);
