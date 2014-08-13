@@ -39,6 +39,7 @@ public class Boy {
 //	public final float MAX_SHRINK_MOD = 1.03f;
 	
 	public boolean hasTail = false;
+	//Max tail positions
 	public final int MAX_POSITIONS = 10;
 	public Array<Vector3> positions = new Array<Vector3>(MAX_POSITIONS);
 	
@@ -74,11 +75,11 @@ public class Boy {
 		boundingCircle = new Circle(-getCorrectedPosition().x, -getCorrectedPosition().y, collisionSize / 2);
 	}
 
+	//returns middle position of the sprite, not the actual position
 	public Vector3 getCorrectedPosition() {
 		return new Vector3(-normalBoy.getX() - normalBoy.getOriginX(),-normalBoy.getY() - normalBoy.getOriginY(),0);
 	}
 	
-
 	public Vector3 getPosition() {
 		return new Vector3(normalBoy.getX(),normalBoy.getY(),0);
 	}
