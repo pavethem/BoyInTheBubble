@@ -15,6 +15,7 @@ public class Bubble2D {
 	Array<Vector2> grads;
 	Circle bubbleCircle;
 	
+	//distance of grads to center
 	float dist;
 	
 	private float camWidth = Gdx.graphics.getWidth() / (1/GameScreen.tiled.getUnitScale());
@@ -58,6 +59,8 @@ public class Bubble2D {
 		
 	}
 	
+	//updates the bubble, and looks for potential collisions of grads with walls, obstacles etc
+	//don't update x or y of grad, if it touches anything
 	public void updateTarget(float x, float y) {
 		
 		x += GameScreen.boy.getOrigin().x;
@@ -80,6 +83,7 @@ public class Bubble2D {
 				toucheswall = true;
 			}
 			
+			//see if it still touches wall
 			if(toucheswall) {
 				if(grads.get(i).dst(center) >= dist) {
 					toucheswall = false;
@@ -102,10 +106,12 @@ public class Bubble2D {
 			}
 
 			if(toucheswall){
+				//still update y, but not x
 				if(touchesleftright) {
 					x = cx;
 					y = center.cpy().add(x,y).y;
 				}
+				//still update x, but not y
 				else if (touchestopbottom) {
 					x = center.cpy().add(x,y).x;
 					y = cy;

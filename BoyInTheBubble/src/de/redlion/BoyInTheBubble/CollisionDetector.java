@@ -70,10 +70,10 @@ public class CollisionDetector {
 //				}
 //			}
 			
-//			for (int i = 0; i < boy.bubble.grads.size; i++) {
-//				if(boy.bubble.grads.get(i).dst(boy.bubble.center) < boy.collisionSize / 2)
-//					boy.isdead = true;
-//			}
+			for (int i = 0; i < boy.bubble.grads.size; i++) {
+				if(boy.bubble.grads.get(i).dst(boy.bubble.center) < boy.collisionSize / 2)
+					boy.isdead = true;
+			}
 
 			
 //			Vector3 from = new Vector3(boy.boyBounds.x + viewBounds.x,boy.boyBounds.y,0);
@@ -114,31 +114,45 @@ public class CollisionDetector {
 		}
 		else {
 			
-			{
+//			{
 				//check GameScreen.splitBoy1
 				if(!GameScreen.splitBoy1.isdead) {
-					int fromX = (int) (GameScreen.splitBoy1.boyBounds.x + viewBounds.x);
-					int fromY = (int) (GameScreen.splitBoy1.boyBounds.y);
-					int toX = (int) (GameScreen.splitBoy1.boyBounds.x + GameScreen.splitBoy1.boyBounds.width + viewBounds.x);
-					int toY = (int) (GameScreen.splitBoy1.boyBounds.y + GameScreen.splitBoy1.boyBounds.height);
-					
-					for(int x = fromX; x<=toX;x++) {
-						for(int y = fromY; y<=toY;y++) {
-							if(layer.getCell(x, y) != null) {
-								GameScreen.splitBoy1.isdead = true;
-								GameScreen.lastPositionBeforeDeath = GameScreen.splitBoy1.getPosition();
-							}
+//					int fromX = (int) (GameScreen.splitBoy1.boyBounds.x + viewBounds.x);
+//					int fromY = (int) (GameScreen.splitBoy1.boyBounds.y);
+//					int toX = (int) (GameScreen.splitBoy1.boyBounds.x + GameScreen.splitBoy1.boyBounds.width + viewBounds.x);
+//					int toY = (int) (GameScreen.splitBoy1.boyBounds.y + GameScreen.splitBoy1.boyBounds.height);
+//					
+//					for(int x = fromX; x<=toX;x++) {
+//						for(int y = fromY; y<=toY;y++) {
+//							if(layer.getCell(x, y) != null) {
+//								GameScreen.splitBoy1.isdead = true;
+//								GameScreen.lastPositionBeforeDeath = GameScreen.splitBoy1.getPosition();
+//							}
+//						}
+//					}
+//				}
+					for (int i = 0; i < GameScreen.splitBoy1.bubble.grads.size; i++) {
+						if(GameScreen.splitBoy1.bubble.grads.get(i).dst(GameScreen.splitBoy1.bubble.center) < GameScreen.splitBoy1.collisionSize / 2) {
+							GameScreen.lastPositionBeforeDeath = GameScreen.splitBoy1.getPosition();
+							GameScreen.splitBoy1.isdead = true;
 						}
 					}
 				}
-			}
-			{
+//			{
 				//check GameScreen.splitBoy2
 				if(!GameScreen.splitBoy2.isdead) {
-					int fromX = (int) (GameScreen.splitBoy2.boyBounds.x + viewBounds.x);
-					int fromY = (int) (GameScreen.splitBoy2.boyBounds.y);
-					int toX = (int) (GameScreen.splitBoy2.boyBounds.x + GameScreen.splitBoy2.boyBounds.width + viewBounds.x);
-					int toY = (int) (GameScreen.splitBoy2.boyBounds.y + GameScreen.splitBoy2.boyBounds.height);
+					
+					for (int i = 0; i < GameScreen.splitBoy2.bubble.grads.size; i++) {
+						if(GameScreen.splitBoy2.bubble.grads.get(i).dst(GameScreen.splitBoy2.bubble.center) < GameScreen.splitBoy2.collisionSize / 2) {
+							GameScreen.lastPositionBeforeDeath = GameScreen.splitBoy2.getPosition();
+							GameScreen.splitBoy2.isdead = true;
+						}
+					}
+					
+//					int fromX = (int) (GameScreen.splitBoy2.boyBounds.x + viewBounds.x);
+//					int fromY = (int) (GameScreen.splitBoy2.boyBounds.y);
+//					int toX = (int) (GameScreen.splitBoy2.boyBounds.x + GameScreen.splitBoy2.boyBounds.width + viewBounds.x);
+//					int toY = (int) (GameScreen.splitBoy2.boyBounds.y + GameScreen.splitBoy2.boyBounds.height);
 					
 	//				Vector3 from = new Vector3(GameScreen.splitBoy2.split_dist, GameScreen.splitBoy2.split_dist,0);
 	//				Vector3 to = new Vector3(GameScreen.splitBoy2.split_dist, GameScreen.splitBoy2.split_dist,0);
@@ -169,18 +183,18 @@ public class CollisionDetector {
 					
 			//		Gdx.app.log("", viewBounds.toString());
 					
-					for(int x = fromX; x<=toX;x++) {
-						for(int y = fromY; y<=toY;y++) {
-							if(layer.getCell(x, y) != null) {
-								GameScreen.splitBoy2.isdead = true;
-								GameScreen.lastPositionBeforeDeath = GameScreen.splitBoy2.getPosition();
-							}
-						}
-					}
+//					for(int x = fromX; x<=toX;x++) {
+//						for(int y = fromY; y<=toY;y++) {
+//							if(layer.getCell(x, y) != null) {
+//								GameScreen.splitBoy2.isdead = true;
+//								GameScreen.lastPositionBeforeDeath = GameScreen.splitBoy2.getPosition();
+//							}
+//						}
+//					}
+					
 				}
 			}
-
-		}
+//		}
 		
 		if(boy.isSplit && GameScreen.splitBoy1.split_dist <= GameScreen.splitBoy1.SPLIT_DISTANCE) {
 			boy.isdead = false;

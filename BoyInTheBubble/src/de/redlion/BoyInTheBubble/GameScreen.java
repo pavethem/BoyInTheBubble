@@ -98,8 +98,8 @@ public class GameScreen implements ApplicationListener {
 //		Body wallBody = world.createBody(walls);
 		
 		boy = new Boy(camera.viewportWidth, camera.viewportHeight,true);
-		splitBoy1 = new Boy(camera.viewportWidth, camera.viewportHeight,false);
-		splitBoy2 = new Boy(camera.viewportWidth, camera.viewportHeight,false);
+		splitBoy1 = new Boy(camera.viewportWidth, camera.viewportHeight,true);
+		splitBoy2 = new Boy(camera.viewportWidth, camera.viewportHeight,true);
 		
 		camController = new OrthoCamController(boyCam);
 		Gdx.input.setInputProcessor(camController);
@@ -185,29 +185,31 @@ public class GameScreen implements ApplicationListener {
 		tiled.render();
 		
 		
-		// render bubble
-		r.begin(ShapeType.Line);
-		r.setColor(0, 0, 0, 1);
-		for (int i = 0; i < boy.bubble.grads.size - 1; i++) {
-			Vector3 temp1 = new Vector3();
-			temp1.set(boy.bubble.grads.get(i).x, boy.bubble.grads.get(i).y,
-					0);
-			boyCam.project(temp1);
-			Vector3 temp2 = new Vector3();
-			temp2.set(boy.bubble.grads.get(i + 1).x,
-					boy.bubble.grads.get(i + 1).y, 0);
-			boyCam.project(temp2);
-
-			r.line(temp1, temp2);
-
-			if (i + 1 == boy.bubble.grads.size - 1) {
-				temp1.set(boy.bubble.grads.get(0).x,
-						boy.bubble.grads.get(0).y, 0);
+		if(!boy.isSplit && splitBoy1.split_dist <= delta) {
+			// render bubble
+			r.begin(ShapeType.Line);
+			r.setColor(0, 0, 0, 1);
+			for (int i = 0; i < boy.bubble.grads.size - 1; i++) {
+				Vector3 temp1 = new Vector3();
+				temp1.set(boy.bubble.grads.get(i).x, boy.bubble.grads.get(i).y,
+						0);
 				boyCam.project(temp1);
-				r.line(temp2, temp1);
+				Vector3 temp2 = new Vector3();
+				temp2.set(boy.bubble.grads.get(i + 1).x,
+						boy.bubble.grads.get(i + 1).y, 0);
+				boyCam.project(temp2);
+	
+				r.line(temp1, temp2);
+	
+				if (i + 1 == boy.bubble.grads.size - 1) {
+					temp1.set(boy.bubble.grads.get(0).x,
+							boy.bubble.grads.get(0).y, 0);
+					boyCam.project(temp1);
+					r.line(temp2, temp1);
+				}
 			}
+			r.end();
 		}
-		r.end();
 		
 		if(boy.isSplit) {
 			splitBoy1.normalBoy.setRotation(boyRotation);
@@ -385,6 +387,7 @@ public class GameScreen implements ApplicationListener {
 					batch.setTransformMatrix(model);
 					splitBoy1.getCurrentFrame(0).draw(batch);
 					batch.end();
+					splitBoy1.bubble.updateTarget(splitBoy1.getPosition().x,splitBoy1.getPosition().y);
 				}
 				
 				//render splitboy2
@@ -405,7 +408,53 @@ public class GameScreen implements ApplicationListener {
 					batch.setTransformMatrix(model);
 					splitBoy2.getCurrentFrame(0).draw(batch);
 					batch.end();
+					splitBoy2.bubble.updateTarget(splitBoy2.getPosition().x,splitBoy2.getPosition().y);
 				}
+				
+				boy.bubble.updateTarget(boy.getPosition().x,boy.getPosition().y);
+				// render bubbles
+				
+				r.begin(ShapeType.Line);
+				r.setColor(0, 0, 0, 1);
+				for (int i = 0; i < splitBoy1.bubble.grads.size - 1; i++) {
+					Vector3 temp1 = new Vector3();
+					temp1.set(splitBoy1.bubble.grads.get(i).x, splitBoy1.bubble.grads.get(i).y,
+							0);
+					boyCam.project(temp1);
+					Vector3 temp2 = new Vector3();
+					temp2.set(splitBoy1.bubble.grads.get(i + 1).x,
+							splitBoy1.bubble.grads.get(i + 1).y, 0);
+					boyCam.project(temp2);
+
+					r.line(temp1, temp2);
+
+					if (i + 1 == splitBoy1.bubble.grads.size - 1) {
+						temp1.set(splitBoy1.bubble.grads.get(0).x,
+								splitBoy1.bubble.grads.get(0).y, 0);
+						boyCam.project(temp1);
+						r.line(temp2, temp1);
+					}
+				}
+				for (int i = 0; i < splitBoy2.bubble.grads.size - 1; i++) {
+					Vector3 temp1 = new Vector3();
+					temp1.set(splitBoy2.bubble.grads.get(i).x, splitBoy2.bubble.grads.get(i).y,
+							0);
+					boyCam.project(temp1);
+					Vector3 temp2 = new Vector3();
+					temp2.set(splitBoy2.bubble.grads.get(i + 1).x,
+							splitBoy2.bubble.grads.get(i + 1).y, 0);
+					boyCam.project(temp2);
+
+					r.line(temp1, temp2);
+
+					if (i + 1 == splitBoy2.bubble.grads.size - 1) {
+						temp1.set(splitBoy2.bubble.grads.get(0).x,
+								splitBoy2.bubble.grads.get(0).y, 0);
+						boyCam.project(temp1);
+						r.line(temp2, temp1);
+					}
+				}
+				r.end();
 				
 				//DEBUG SPLIT
 //				Vector3 yob = boy.getPosition().cpy();
