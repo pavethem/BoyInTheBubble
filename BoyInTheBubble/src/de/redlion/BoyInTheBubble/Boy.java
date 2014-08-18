@@ -45,6 +45,9 @@ public class Boy {
 	
 	Bubble2D bubble;
 	
+	//bubbles for tail positions
+	public Array<Bubble2D> tailBubbles = new Array<Bubble2D>(MAX_POSITIONS);
+	
 	public Boy(float width, float height, boolean createBubble) {
 		
 		boyTex = Resources.getInstance().boyTextures;
@@ -148,17 +151,31 @@ public class Boy {
 	public boolean tail() {
 		hasTail = !hasTail;
 		positions.clear();
+		tailBubbles.clear();
+		
 		return hasTail;
 	}
 	
 	public void updateTail(Vector3 position) {
 		if(positions.size < MAX_POSITIONS) {
 			positions.insert(0, position);
+			Bubble2D tempBubble = new Bubble2D(bubbleSize, position);
+			tailBubbles.insert(0, tempBubble);
 		}
 		else {
 			positions.pop();
+			tailBubbles.pop();
 			positions.insert(0, position);
+			Bubble2D tempBubble = new Bubble2D(bubbleSize, position);
+			tailBubbles.insert(0, tempBubble);
 		}
+		
+		for (int i = 0; i < tailBubbles.size; i++) {
+			Bubble2D b = tailBubbles.get(i);
+			Vector3 pos = positions.get(i);
+			b.updateTarget(-pos.x - size/2, -pos.y - size/2);		
+		}
+		System.out.println(tailBubbles.size);
 	}
 	
 }

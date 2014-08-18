@@ -343,6 +343,33 @@ public class GameScreen implements ApplicationListener {
 						boy.getCurrentFrame(0).draw(batch, 10 * (boy.positions.indexOf(p, false) + 1));
 						batch.end();
 					}
+					
+					//render tailbubbles
+					r.begin(ShapeType.Line);
+					r.setColor(0, 0, 0, 1);
+					for(Bubble2D b : boy.tailBubbles) {
+						for (int i = 0; i < b.grads.size - 1; i++) {
+							Vector3 temp1 = new Vector3();
+							temp1.set(b.grads.get(i).x, b.grads.get(i).y,
+									0);
+							boyCam.project(temp1);
+							Vector3 temp2 = new Vector3();
+							temp2.set(b.grads.get(i + 1).x,
+									b.grads.get(i + 1).y, 0);
+							boyCam.project(temp2);
+				
+							r.line(temp1, temp2);
+				
+							if (i + 1 == b.grads.size - 1) {
+								temp1.set(b.grads.get(0).x,
+										b.grads.get(0).y, 0);
+								boyCam.project(temp1);
+								r.line(temp2, temp1);
+							}
+						}
+					}
+					r.end();
+					
 				}
 			}
 			//split boy
