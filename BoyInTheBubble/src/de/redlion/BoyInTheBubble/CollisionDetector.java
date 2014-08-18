@@ -17,6 +17,7 @@ public class CollisionDetector {
 	
 	Spawner spawner;
 	int lastRow;
+	//collisionobjects
 	Array<Circle> circles; 
 	
 	public CollisionDetector(MapLayers layers) {
@@ -27,6 +28,7 @@ public class CollisionDetector {
 		
 		for(MapObject c : layers.get("collisions").getObjects()) {
 			
+			//just produce some circles for easy collision detection
 			if(c instanceof EllipseMapObject) {
 				EllipseMapObject e = (EllipseMapObject) c;
 				Ellipse el = e.getEllipse();
@@ -43,6 +45,7 @@ public class CollisionDetector {
 		}
 	}
 	
+	//checks each position individually (for bubbly physics)
 	public boolean bubbleCheck(Circle boundingCircle, Vector2 pos) {
 		
 		for (Circle c : circles) {
@@ -54,15 +57,16 @@ public class CollisionDetector {
 		return false;
 	}
 
+	//check if bubble is stretche too thin -> collision
 	public void collisionCheck(Boy boy, TiledMapTileLayer layer, Rectangle viewBounds) {
 		
 		spawner.update(viewBounds.x+viewBounds.getWidth());
 
 		if(!boy.isSplit) {
-			int fromX = (int) (boy.boyBounds.x + viewBounds.x);
-			int fromY = (int) (boy.boyBounds.y);
-			int toX = (int) (boy.boyBounds.x + boy.boyBounds.width + viewBounds.x);
-			int toY = (int) (boy.boyBounds.y + boy.boyBounds.height);
+//			int fromX = (int) (boy.boyBounds.x + viewBounds.x);
+//			int fromY = (int) (boy.boyBounds.y);
+//			int toX = (int) (boy.boyBounds.x + boy.boyBounds.width + viewBounds.x);
+//			int toY = (int) (boy.boyBounds.y + boy.boyBounds.height);
 			
 //			for (Circle c : circles) {
 //				if(boy.boundingCircle.overlaps(c)) {
@@ -95,21 +99,21 @@ public class CollisionDetector {
 //				}
 //			}
 			
-			if(boy.hasTail) {
-				for(Vector3 p : boy.positions) {
-					fromX = (int) (-p.x + viewBounds.x);
-					fromY = (int) (-p.y);
-					toX = (int) (-p.x - boy.getOrigin().x + boy.boyBounds.width + viewBounds.x);
-					toY = (int) (-p.y - boy.getOrigin().y + boy.boyBounds.height);
-					
-					for(int x = fromX; x<=toX;x++) {
-						for(int y = fromY; y<=toY;y++) {
-							if(layer.getCell(x, y) != null)
-								boy.isdead = true;
-						}
-					}
-				}
-			}
+//			if(boy.hasTail) {
+//				for(Vector3 p : boy.positions) {
+//					fromX = (int) (-p.x + viewBounds.x);
+//					fromY = (int) (-p.y);
+//					toX = (int) (-p.x - boy.getOrigin().x + boy.boyBounds.width + viewBounds.x);
+//					toY = (int) (-p.y - boy.getOrigin().y + boy.boyBounds.height);
+//					
+//					for(int x = fromX; x<=toX;x++) {
+//						for(int y = fromY; y<=toY;y++) {
+//							if(layer.getCell(x, y) != null)
+//								boy.isdead = true;
+//						}
+//					}
+//				}
+//			}
 			
 		}
 		else {
