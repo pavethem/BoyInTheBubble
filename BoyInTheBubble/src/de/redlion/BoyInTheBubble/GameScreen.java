@@ -413,7 +413,6 @@ public class GameScreen implements ApplicationListener {
 					position.add(-middle.getOriginX()*5+middle.getX(),-middle.getOriginY()*5 + middle.getY(),0);
 
 					splitBoy1.boundingCircle.setPosition(splitBoy1.getPosition().x + splitBoy1.getOrigin().x,splitBoy1.getPosition().y + + splitBoy1.getOrigin().y);
-					System.out.println(splitBoy1.boundingCircle.x +  " " + splitBoy1.boundingCircle.y);
 					
 					splitBoy1.normalBoy.setPosition(position.x,position.y);
 					splitBoy1.boyBounds.setX(position.x);

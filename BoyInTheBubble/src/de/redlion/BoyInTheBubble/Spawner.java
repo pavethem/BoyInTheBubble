@@ -14,6 +14,7 @@ public class Spawner {
 	public ArrayList<Rectangle> rectangles;
 	private final float EPSILON = 0.1f;
 	
+	//spawns objects on screen
 	public Spawner(MapLayer layer) {
 		
 		this.layer = layer;
