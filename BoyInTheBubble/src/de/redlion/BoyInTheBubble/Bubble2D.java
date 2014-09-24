@@ -70,6 +70,14 @@ public class Bubble2D {
 		bubbleCircle.setPosition(center);
 		
 		for(int i=0;i<NUM_SEGMENTS;i++){
+			
+			x = MathUtils.cosDeg(360/NUM_SEGMENTS*i) * dist;
+	        y = MathUtils.sinDeg(360/NUM_SEGMENTS*i) * dist;
+	        
+	        float cx = grads.get(i).x;
+	        float cy = grads.get(i).y;
+			
+			
 			boolean toucheswall = false;
 			
 			boolean touchesleftright = false;
@@ -91,12 +99,6 @@ public class Bubble2D {
 					touchestopbottom = false;
 				}
 			}
-			
-			x = MathUtils.cosDeg(360/NUM_SEGMENTS*i) * dist;
-	        y = MathUtils.sinDeg(360/NUM_SEGMENTS*i) * dist;
-	        
-	        float cx = grads.get(i).x;
-	        float cy = grads.get(i).y;
 	        
 	        boolean collides = GameScreen.collisionDetector.bubbleCheck(bubbleCircle, center.cpy().add(x,y));
 	        
@@ -104,7 +106,7 @@ public class Bubble2D {
 	        if(!collides) {
 	        	grads.get(i).set(center.cpy().add(x,y));
 			}
-
+	        
 			if(toucheswall){
 				//still update y, but not x
 				if(touchesleftright) {
@@ -116,8 +118,17 @@ public class Bubble2D {
 					x = center.cpy().add(x,y).x;
 					y = cy;
 				}
+				
 				grads.get(i).set(x,y);
 			}
+		
+			x= grads.get(i).x;
+			y= grads.get(i).y;
+			
+			x = Math.max(0.1f, Math.min(camWidth-0.1f, x));
+			y = Math.max(0.1f, Math.min(camHeight-0.1f, y));
+			
+			grads.get(i).set(x,y);
 			
 		}
 	}

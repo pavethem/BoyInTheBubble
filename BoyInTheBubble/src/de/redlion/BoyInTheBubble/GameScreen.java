@@ -301,6 +301,9 @@ public class GameScreen implements ApplicationListener {
 			
 			//normal boy // tail boy stuff
 			if(!boy.isSplit && splitBoy1.split_dist <= 0) {
+				
+				boy.bubble.updateTarget(boy.getPosition().x,boy.getPosition().y);
+				
 				model.idt();
 				temp.idt();
 //				temp.setToScaling(boy.normalBoy.getScaleX(),boy.normalBoy.getScaleY(),0);
