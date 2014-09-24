@@ -58,7 +58,7 @@ public class CollisionDetector {
 	}
 
 	//check if bubble is stretche too thin -> collision
-	public void collisionCheck(Boy boy, TiledMapTileLayer layer, Rectangle viewBounds) {
+	public void collisionCheck(Boy boy, Rectangle viewBounds) {
 		
 		spawner.update(viewBounds.x+viewBounds.getWidth());
 
@@ -68,16 +68,17 @@ public class CollisionDetector {
 //			int toX = (int) (boy.boyBounds.x + boy.boyBounds.width + viewBounds.x);
 //			int toY = (int) (boy.boyBounds.y + boy.boyBounds.height);
 			
-//			for (Circle c : circles) {
-//				if(boy.boundingCircle.overlaps(c)) {
-//					boy.isdead = false;
+			for (Circle c : circles) {
+				if(boy.boundingCircle.overlaps(c)) {
+					boy.isdead = true;
+				}
+			}
+			
+//			for (int i = 0; i < boy.bubble.grads.size; i++) {
+//				if(boy.bubble.grads.get(i).dst(boy.bubble.center) < boy.collisionSize / 2) {
+//					boy.isdead = true;
 //				}
 //			}
-			
-			for (int i = 0; i < boy.bubble.grads.size; i++) {
-				if(boy.bubble.grads.get(i).dst(boy.bubble.center) < boy.collisionSize / 2)
-					boy.isdead = true;
-			}
 
 			
 //			Vector3 from = new Vector3(boy.boyBounds.x + viewBounds.x,boy.boyBounds.y,0);

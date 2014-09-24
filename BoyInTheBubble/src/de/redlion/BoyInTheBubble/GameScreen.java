@@ -234,7 +234,7 @@ public class GameScreen implements ApplicationListener {
 			}
 		}
 		
-		collisionDetector.collisionCheck(boy, layer, tiled.getViewBounds());
+		collisionDetector.collisionCheck(boy, tiled.getViewBounds());
 		
 		if(!boy.isdead) {
 			
