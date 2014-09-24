@@ -57,7 +57,7 @@ public class CollisionDetector {
 		return false;
 	}
 
-	//check if bubble is stretche too thin -> collision
+	//check if bubble is stretches too thin -> collision
 	public void collisionCheck(Boy boy, Rectangle viewBounds) {
 		
 		spawner.update(viewBounds.x+viewBounds.getWidth());
@@ -136,23 +136,37 @@ public class CollisionDetector {
 //						}
 //					}
 //				}
-					for (int i = 0; i < GameScreen.splitBoy1.bubble.grads.size; i++) {
-						if(GameScreen.splitBoy1.bubble.grads.get(i).dst(GameScreen.splitBoy1.bubble.center) < GameScreen.splitBoy1.collisionSize / 2) {
+					for (Circle c : circles) {
+						if(GameScreen.splitBoy1.boundingCircle.overlaps(c)) {
 							GameScreen.lastPositionBeforeDeath = GameScreen.splitBoy1.getPosition();
 							GameScreen.splitBoy1.isdead = true;
 						}
 					}
+					
+//					for (int i = 0; i < GameScreen.splitBoy1.bubble.grads.size; i++) {
+//						if(GameScreen.splitBoy1.bubble.grads.get(i).dst(GameScreen.splitBoy1.bubble.center) < GameScreen.splitBoy1.collisionSize / 2) {
+//							GameScreen.lastPositionBeforeDeath = GameScreen.splitBoy1.getPosition();
+//							GameScreen.splitBoy1.isdead = true;
+//						}
+//					}
 				}
 //			{
 				//check GameScreen.splitBoy2
 				if(!GameScreen.splitBoy2.isdead) {
 					
-					for (int i = 0; i < GameScreen.splitBoy2.bubble.grads.size; i++) {
-						if(GameScreen.splitBoy2.bubble.grads.get(i).dst(GameScreen.splitBoy2.bubble.center) < GameScreen.splitBoy2.collisionSize / 2) {
+					for (Circle c : circles) {
+						if(GameScreen.splitBoy2.boundingCircle.overlaps(c)) {
 							GameScreen.lastPositionBeforeDeath = GameScreen.splitBoy2.getPosition();
 							GameScreen.splitBoy2.isdead = true;
 						}
 					}
+					
+//					for (int i = 0; i < GameScreen.splitBoy2.bubble.grads.size; i++) {
+//						if(GameScreen.splitBoy2.bubble.grads.get(i).dst(GameScreen.splitBoy2.bubble.center) < GameScreen.splitBoy2.collisionSize / 2) {
+//							GameScreen.lastPositionBeforeDeath = GameScreen.splitBoy2.getPosition();
+//							GameScreen.splitBoy2.isdead = true;
+//						}
+//					}
 					
 //					int fromX = (int) (GameScreen.splitBoy2.boyBounds.x + viewBounds.x);
 //					int fromY = (int) (GameScreen.splitBoy2.boyBounds.y);

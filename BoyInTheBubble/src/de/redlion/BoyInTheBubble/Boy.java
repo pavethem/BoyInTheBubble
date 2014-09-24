@@ -175,7 +175,7 @@ public class Boy {
 			Vector3 pos = positions.get(i);
 			b.updateTarget(-pos.x - size/2, -pos.y - size/2);		
 		}
-//		System.out.println(tailBubbles.size);
+		System.out.println(tailBubbles.size);
 	}
 	
 }

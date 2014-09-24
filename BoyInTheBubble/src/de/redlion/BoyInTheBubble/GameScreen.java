@@ -261,6 +261,8 @@ public class GameScreen implements ApplicationListener {
 				//bubble is a little bigger than boy
 				boy.bubbleSize = boy.size + 0.3f;
 				boy.bubble.scale(boy.bubbleSize);
+				
+				boy.boundingCircle.setRadius(boy.collisionSize/2);
 
 //				boy.normalBoy.setOrigin(boy.size / 2, boy.size / 2);
 //				float offset = (boy.size - boy.targetSize) /2;
@@ -279,6 +281,8 @@ public class GameScreen implements ApplicationListener {
 				boy.bubbleSize = boy.size + 0.3f;
 				boy.bubble.scale(boy.bubbleSize);
 				
+				boy.boundingCircle.setRadius(boy.collisionSize/2);
+				
 //				boy.normalBoy.setOrigin(boy.size / 2, boy.size / 2);
 //				float offset = (boy.targetSize - boy.size) /2;
 //				offset/=20;
@@ -291,6 +295,8 @@ public class GameScreen implements ApplicationListener {
 				boy.size = boy.targetSize;
 				//80% of actual size
 				boy.collisionSize = (boy.size * 80) / 100;
+				
+				boy.boundingCircle.setRadius(boy.collisionSize/2);
 				
 //				boy.normalBoy.setOrigin(boy.size / 2, boy.size / 2);
 //				float offset = (boy.targetSize - boy.size) /2;
@@ -400,10 +406,14 @@ public class GameScreen implements ApplicationListener {
 				
 				//render splitboy1
 				if(!splitBoy1.isdead) {
+					
 					position.set(splitBoy1.split_dist, splitBoy1.split_dist,0);
 					position.rotate(Vector3.Z, splitRotation);
 					//NO IDEA WHY *5
 					position.add(-middle.getOriginX()*5+middle.getX(),-middle.getOriginY()*5 + middle.getY(),0);
+
+					splitBoy1.boundingCircle.setPosition(splitBoy1.getPosition().x + splitBoy1.getOrigin().x,splitBoy1.getPosition().y + + splitBoy1.getOrigin().y);
+					System.out.println(splitBoy1.boundingCircle.x +  " " + splitBoy1.boundingCircle.y);
 					
 					splitBoy1.normalBoy.setPosition(position.x,position.y);
 					splitBoy1.boyBounds.setX(position.x);
@@ -426,6 +436,8 @@ public class GameScreen implements ApplicationListener {
 					position.rotate(Vector3.Z, splitRotation);
 					//NO IDEA WHY *5
 					position.add(-middle.getOriginX()*5+middle.getX(),-middle.getOriginY()*5 + middle.getY(),0);
+					
+					splitBoy2.boundingCircle.setPosition(splitBoy2.getPosition().x + splitBoy2.getOrigin().x,splitBoy2.getPosition().y + + splitBoy2.getOrigin().y);
 		
 					splitBoy2.normalBoy.setPosition(position.x,position.y);
 					splitBoy2.boyBounds.setX(position.x);
@@ -446,42 +458,46 @@ public class GameScreen implements ApplicationListener {
 				
 				r.begin(ShapeType.Line);
 				r.setColor(0, 0, 0, 1);
-				for (int i = 0; i < splitBoy1.bubble.grads.size - 1; i++) {
-					Vector3 temp1 = new Vector3();
-					temp1.set(splitBoy1.bubble.grads.get(i).x, splitBoy1.bubble.grads.get(i).y,
-							0);
-					boyCam.project(temp1);
-					Vector3 temp2 = new Vector3();
-					temp2.set(splitBoy1.bubble.grads.get(i + 1).x,
-							splitBoy1.bubble.grads.get(i + 1).y, 0);
-					boyCam.project(temp2);
-
-					r.line(temp1, temp2);
-
-					if (i + 1 == splitBoy1.bubble.grads.size - 1) {
-						temp1.set(splitBoy1.bubble.grads.get(0).x,
-								splitBoy1.bubble.grads.get(0).y, 0);
+				if(!splitBoy1.isdead) {
+					for (int i = 0; i < splitBoy1.bubble.grads.size - 1; i++) {
+						Vector3 temp1 = new Vector3();
+						temp1.set(splitBoy1.bubble.grads.get(i).x, splitBoy1.bubble.grads.get(i).y,
+								0);
 						boyCam.project(temp1);
-						r.line(temp2, temp1);
+						Vector3 temp2 = new Vector3();
+						temp2.set(splitBoy1.bubble.grads.get(i + 1).x,
+								splitBoy1.bubble.grads.get(i + 1).y, 0);
+						boyCam.project(temp2);
+	
+						r.line(temp1, temp2);
+	
+						if (i + 1 == splitBoy1.bubble.grads.size - 1) {
+							temp1.set(splitBoy1.bubble.grads.get(0).x,
+									splitBoy1.bubble.grads.get(0).y, 0);
+							boyCam.project(temp1);
+							r.line(temp2, temp1);
+						}
 					}
 				}
-				for (int i = 0; i < splitBoy2.bubble.grads.size - 1; i++) {
-					Vector3 temp1 = new Vector3();
-					temp1.set(splitBoy2.bubble.grads.get(i).x, splitBoy2.bubble.grads.get(i).y,
-							0);
-					boyCam.project(temp1);
-					Vector3 temp2 = new Vector3();
-					temp2.set(splitBoy2.bubble.grads.get(i + 1).x,
-							splitBoy2.bubble.grads.get(i + 1).y, 0);
-					boyCam.project(temp2);
-
-					r.line(temp1, temp2);
-
-					if (i + 1 == splitBoy2.bubble.grads.size - 1) {
-						temp1.set(splitBoy2.bubble.grads.get(0).x,
-								splitBoy2.bubble.grads.get(0).y, 0);
+				if(!splitBoy2.isdead) {
+					for (int i = 0; i < splitBoy2.bubble.grads.size - 1; i++) {
+						Vector3 temp1 = new Vector3();
+						temp1.set(splitBoy2.bubble.grads.get(i).x, splitBoy2.bubble.grads.get(i).y,
+								0);
 						boyCam.project(temp1);
-						r.line(temp2, temp1);
+						Vector3 temp2 = new Vector3();
+						temp2.set(splitBoy2.bubble.grads.get(i + 1).x,
+								splitBoy2.bubble.grads.get(i + 1).y, 0);
+						boyCam.project(temp2);
+	
+						r.line(temp1, temp2);
+	
+						if (i + 1 == splitBoy2.bubble.grads.size - 1) {
+							temp1.set(splitBoy2.bubble.grads.get(0).x,
+									splitBoy2.bubble.grads.get(0).y, 0);
+							boyCam.project(temp1);
+							r.line(temp2, temp1);
+						}
 					}
 				}
 				r.end();
@@ -503,6 +519,7 @@ public class GameScreen implements ApplicationListener {
 //				r.begin(ShapeType.Line);
 //				r.setColor(1,0,0,1);
 //				r.line(from.x,from.y,to.x,to.y);
+//				r.circle(from.x, from.y, 65);
 //				r.circle(yob.x, yob.y, 2);
 //				r.setColor(0,1,0,1);
 //				r.circle(mid.x, mid.y, 2);
