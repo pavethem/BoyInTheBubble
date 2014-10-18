@@ -55,7 +55,7 @@ public class CollisionDetector {
 		return false;
 	}
 
-	//check if bubble is stretches too thin -> collision
+	//check if boundingCircle overlaps a Circle of a MapObject
 	public void collisionCheck(Boy boy, Rectangle viewBounds) {
 
 		if(!boy.isSplit) {
