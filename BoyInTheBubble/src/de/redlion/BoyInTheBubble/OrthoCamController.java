@@ -16,6 +16,7 @@ public class OrthoCamController extends InputAdapter {
 	final Vector2 last = new Vector2();
 	float delta = 0f;
 	
+	//mouse offset from center of the bubble
 	float offsetX = 0;
 	float screenOffsetX = 0;
 	float offsetY = 0;
@@ -42,6 +43,7 @@ public class OrthoCamController extends InputAdapter {
 			
 			float size =  GameScreen.boy.getSize();
 			
+			//actual posiotion (at the bottom left of the sprite)
 			int correctedX = (int) (x - size/2 - screenOffsetX);
 			int correctedY = (int) (y + size/2 + screenOffsetY);
 
@@ -69,7 +71,6 @@ public class OrthoCamController extends InputAdapter {
 	@Override
 	public boolean touchUp (int x, int y, int pointer, int button) {
 		touched = false;
-//		GameScreen.boy.bubble.destroyMouseJoint();
 		return true;
 	}
 	
@@ -95,12 +96,6 @@ public class OrthoCamController extends InputAdapter {
 		
 		if(box.contains(x,y) && !GameScreen.boy.isdead) {
 			touched = true;
-//			GameScreen.boy.bubble.createMouseJoint();
-//			float sizemod = 1.0f;
-//			if(GameScreen.boy.isBig)
-//				sizemod = 1 + GameScreen.boy.normalBoy.getWidth() - 1.5f;
-//			else if(GameScreen.boy.isSmall)
-//				sizemod = 1.5f - GameScreen.boy.normalBoy.getWidth();
 			
 			float centerX = GameScreen.boy.getPosition().x + GameScreen.boy.size / 2;
 			float screenCenterX = box.x + (w / 2);

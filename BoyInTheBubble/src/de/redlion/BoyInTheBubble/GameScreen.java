@@ -33,6 +33,8 @@ public class GameScreen implements ApplicationListener {
 	public static Boy splitBoy1;
 	public static Boy splitBoy2;
 	
+	Spawner spawner;
+	
 	Sprite middle;
 	
 	Sprite blackFade;
@@ -85,17 +87,6 @@ public class GameScreen implements ApplicationListener {
 		camera.setToOrtho(false, 32, 20);
 		boyCam.setToOrtho(false, 32, 20);
 		tiled.setView(camera);
-
-
-		
-//		world = new World(new Vector2(0,0), true);
-//		debugRenderer = new Box2DDebugRenderer();
-		
-//		BodyDef walls = new BodyDef();
-//		walls.type = BodyType.StaticBody;
-//		walls.position.set(0,0);
-		
-//		Body wallBody = world.createBody(walls);
 		
 		boy = new Boy(camera.viewportWidth, camera.viewportHeight,true);
 		splitBoy1 = new Boy(camera.viewportWidth, camera.viewportHeight,true);
@@ -119,21 +110,13 @@ public class GameScreen implements ApplicationListener {
 		
 		layer = (TiledMapTileLayer) tiled.getMap().getLayers().get(0);
 		
+		spawner = new Spawner(tiled.getMap().getLayers().get("movables"));
+		
 //		tiled.getMap().getTileSets().getTileSet(0).getTile(1).getTextureRegion().getTexture().setFilter(TextureFilter.Linear, TextureFilter.Linear);
 		
 		stateTime = 0;
 		finished = false;
 		fade = 1.0f;
-		
-//		wallBody.setUserData("wall");
-//		ChainShape borders = new ChainShape();
-//		Vector2[] vertices = {new Vector2(0,0),new Vector2(camera.viewportWidth / Constants.PIXELS_PER_METER,0),
-//				new Vector2(camera.viewportWidth/Constants.PIXELS_PER_METER,camera.viewportHeight/Constants.PIXELS_PER_METER),
-//				new Vector2(0,camera.viewportHeight/Constants.PIXELS_PER_METER)};
-//		borders.createLoop(vertices);
-//		borders.setRadius(0);
-//		wallBody.createFixture(borders,100f).setFriction(0);
-//		borders.dispose();
 		
 		lastPosition = new Vector3(0, 0, 0);
 		
@@ -235,6 +218,7 @@ public class GameScreen implements ApplicationListener {
 		}
 		
 		collisionDetector.collisionCheck(boy, tiled.getViewBounds());
+		spawner.update(tiled.getViewBounds().x+tiled.getViewBounds().getWidth());
 		
 		if(!boy.isdead) {
 			
