@@ -41,6 +41,8 @@ public class Boy {
 	public boolean hasTail = false;
 	//Max tail positions
 	public final int MAX_POSITIONS = 10;
+	//Max distace between two tail positions
+	public final float MAX_DISTANCE = 0.7f;
 	public Array<Vector3> positions = new Array<Vector3>(MAX_POSITIONS);
 	
 	Bubble2D bubble;
@@ -175,7 +177,30 @@ public class Boy {
 			Vector3 pos = positions.get(i);
 			b.updateTarget(-pos.x - size/2, -pos.y - size/2);		
 		}
-		System.out.println(tailBubbles.size);
+		
+		//clamp distance between tail positions
+		if(positions.size == MAX_POSITIONS) {
+			for(int i=0;i<MAX_POSITIONS;i++) {
+				if(i+1==MAX_POSITIONS)
+					break;
+				
+				Vector3 current = positions.get(i).cpy();
+				Vector3 next = positions.get(i+1).cpy();
+				
+				if(current.dst(next) >= MAX_DISTANCE) {
+				
+					System.out.println(i + " to " + String.valueOf(i+1) + ":");
+					System.out.println(current.dst(next));
+					
+					//a+(b-a)
+					Vector3 direction = next.sub(current);
+					direction.clamp(0, MAX_DISTANCE);
+					System.out.println(direction);
+					positions.get(i+1).set(current.add(direction));
+				}
+				
+			}
+		}
 	}
 	
 }

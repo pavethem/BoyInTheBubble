@@ -3,6 +3,7 @@ package de.redlion.BoyInTheBubble;
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL10;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
@@ -321,26 +322,37 @@ public class GameScreen implements ApplicationListener {
 				batch.end();
 				
 				if(boy.hasTail) {
-					for(Vector3 p : boy.positions) {
-						model.idt();
-						temp.idt();
-						temp.setToTranslation(-p.x ,-p.y ,0);
-						model.mul(temp);
-						temp.setToRotation(Vector3.Z, boyRotation);
-						model.mul(temp);
-						temp.setToTranslation(position);
-						model.mul(temp);
-						batch.setProjectionMatrix(boyCam.combined);
-						batch.begin();
-						batch.setTransformMatrix(model);
-						boy.getCurrentFrame(0).draw(batch, 10 * (boy.positions.indexOf(p, false) + 1));
-						batch.end();
-					}
 					
-					//render tailbubbles
+					//render tailboys (though not the first one)
+//					for(int i=1;i<boy.positions.size;i++) {
+//						Vector3 p = boy.positions.get(i);
+//						model.idt();
+//						temp.idt();
+//						temp.setToTranslation(-p.x ,-p.y ,0);
+//						model.mul(temp);
+//						temp.setToRotation(Vector3.Z, boyRotation);
+//						model.mul(temp);
+//						temp.setToTranslation(position);
+//						model.mul(temp);
+//						batch.setProjectionMatrix(boyCam.combined);
+//						batch.begin();
+//						batch.setTransformMatrix(model);
+//						boy.getCurrentFrame(0).draw(batch, 10 * (i+1));
+//						batch.end();
+//					}
+					
+					//render tailbubbles (though not the first one)
+					
+					Gdx.gl.glEnable(GL20.GL_BLEND);
 					r.begin(ShapeType.Line);
-					r.setColor(0, 0, 0, 1);
-					for(Bubble2D b : boy.tailBubbles) {
+					for(int j=1;j<boy.tailBubbles.size;j++) {
+						
+						Bubble2D b = boy.tailBubbles.get(j);
+						
+						float alpha = 1.0f / (j+1);
+
+						r.setColor(0, 0, 0, alpha);
+						
 						for (int i = 0; i < b.grads.size - 1; i++) {
 							Vector3 temp1 = new Vector3();
 							temp1.set(b.grads.get(i).x, b.grads.get(i).y,
@@ -360,9 +372,10 @@ public class GameScreen implements ApplicationListener {
 								r.line(temp2, temp1);
 							}
 						}
+						
 					}
 					r.end();
-					
+					Gdx.gl.glDisable(GL20.GL_BLEND);
 				}
 			}
 			//split boy
