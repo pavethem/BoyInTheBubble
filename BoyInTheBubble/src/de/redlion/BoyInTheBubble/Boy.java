@@ -1,5 +1,7 @@
 package de.redlion.BoyInTheBubble;
 
+import com.badlogic.gdx.Game;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Sprite;
@@ -33,6 +35,8 @@ public class Boy {
 	public float targetSize = originalSize;
 	public float smallSize = 1.5f;
 	public float bigSize = 5f;
+	
+	public float repelFactor = 1.0f;
 	
 	public final float SPLIT_DISTANCE = 1.9f;
 //	public final float MAX_GROWTH_MOD = 1.03f;
@@ -188,18 +192,48 @@ public class Boy {
 				Vector3 next = positions.get(i+1).cpy();
 				
 				if(current.dst(next) >= MAX_DISTANCE) {
-				
-					System.out.println(i + " to " + String.valueOf(i+1) + ":");
-					System.out.println(current.dst(next));
 					
 					//a+(b-a)
 					Vector3 direction = next.sub(current);
 					direction.clamp(0, MAX_DISTANCE);
-					System.out.println(direction);
 					positions.get(i+1).set(current.add(direction));
 				}
 				
 			}
+		}
+	}
+	
+	//draw or repel boy
+	public void manipulateBoy(Wormhole worm, Vector3 pos3D) {
+		
+		//20 because of number of rows
+		Vector3 pos = new Vector3(bubble.center.x,20-bubble.center.y,0);
+		Vector3 wormPos = pos3D.cpy();
+		
+		// b+(a+(b-a)) with some scaling because the directions are all wrong
+		Vector3 direction = wormPos.sub(pos);
+		direction.scl(1, -1, 1);
+		Vector3 end = wormPos.add(direction);
+		end.scl(-1);
+		// clamp so it's the same distance
+		end.clamp(Constants.MAX_REPEL_DISTANCE - pos.dst(pos3D.cpy()), Constants.MAX_REPEL_DISTANCE - pos.dst(pos3D.cpy()));
+		Vector3 mirror = this.getCorrectedPosition().cpy().scl(-1);
+		mirror.add(end);
+		GameScreen.mirrorWorm.position.set(mirror);
+		
+		repelFactor+=0.01f;
+		if(repelFactor <= 1.0f) {
+		
+			Vector3 newPos = new Vector3(bubble.center.x-this.getOrigin().x,bubble.center.y-this.getOrigin().y,0);
+			pos3D.y = 20 - pos3D.y;
+			pos3D.lerp(mirror, repelFactor);
+			newPos.set(pos3D);
+			newPos.sub(getOrigin().x, getOrigin().y, 0);
+			bubble.updateTarget(newPos.x,newPos.y);
+//			normalBoy.setPosition(newPos.x, newPos.y);
+//			boundingCircle.setPosition(newPos.x,newPos.y);
+		}else {
+			repelFactor =1.0f;
 		}
 	}
 	

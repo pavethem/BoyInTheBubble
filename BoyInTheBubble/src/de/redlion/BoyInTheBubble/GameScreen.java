@@ -16,6 +16,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.World;
 
@@ -62,6 +63,10 @@ public class GameScreen implements ApplicationListener {
 	static float boyRotation = 0;
 	float splitRotation = 0;
 	final float ROTATION_MULTIPLIER = 20;
+	
+	public static Wormhole worm;
+	public static Wormhole mirrorWorm;
+	public static boolean wormHoleAffected;
 	
 	public static CollisionDetector collisionDetector;
 	
@@ -134,6 +139,10 @@ public class GameScreen implements ApplicationListener {
 		boyRotation = 0;
 		splitRotation = 0;
 		collisionDetector = new CollisionDetector(tiled.getMap().getLayers());
+		
+		worm = new Wormhole(new Vector3(-10,-10,-10),true);
+		mirrorWorm = new Wormhole(new Vector3(-10,-10,-10),true);
+		wormHoleAffected = false;
 		
 		Gdx.gl20.glLineWidth(10);
 	}
@@ -668,6 +677,32 @@ public class GameScreen implements ApplicationListener {
 			fadeBatch.end();
 		}
 		
+		//draw wormhole
+		r.begin(ShapeType.Filled);
+		r.setColor(Color.RED);
+		r.circle(worm.position.x, worm.position.y, worm.radius);
+		r.end();
+		
+		//draw mirrorworm
+		r.begin(ShapeType.Filled);
+		r.setColor(Color.BLUE);
+		boyCam.project(mirrorWorm.position);
+		r.circle(mirrorWorm.position.x, mirrorWorm.position.y, mirrorWorm.radius);
+		r.end();
+		
+		Vector3 wurm = worm.position.cpy();
+		//20 because of 20 rows
+		Vector3 pos = new Vector3(boy.bubble.center.x,20-boy.bubble.center.y,0);
+		
+		boyCam.unproject(wurm);
+		
+		if(pos.dst(wurm) <= Constants.MAX_REPEL_DISTANCE) {
+			wormHoleAffected = true;
+			Vector3 wormPos = worm.position.cpy();
+			boyCam.unproject(wormPos);
+			boy.manipulateBoy(worm, wormPos);
+		} else
+			wormHoleAffected = false;
 	}
 
 

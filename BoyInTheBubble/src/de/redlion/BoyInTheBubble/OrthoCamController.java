@@ -1,6 +1,8 @@
 package de.redlion.BoyInTheBubble;
 
+import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -8,6 +10,7 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.scenes.scene2d.ui.Button;
 
 public class OrthoCamController extends InputAdapter {
 
@@ -43,7 +46,7 @@ public class OrthoCamController extends InputAdapter {
 			
 			float size =  GameScreen.boy.getSize();
 			
-			//actual posiotion (at the bottom left of the sprite)
+			//actual position (at the bottom left of the sprite)
 			int correctedX = (int) (x - size/2 - screenOffsetX);
 			int correctedY = (int) (y + size/2 + screenOffsetY);
 
@@ -57,10 +60,12 @@ public class OrthoCamController extends InputAdapter {
 			Vector3 newPos = new Vector3(correctedX, correctedY,0);		
 			camera.unproject(newPos);
 			
-			GameScreen.boy.normalBoy.setPosition(newPos.x , newPos.y );
-			GameScreen.boy.boundingCircle.setPosition(newPos.x + GameScreen.boy.getOrigin().x, newPos.y + GameScreen.boy.getOrigin().y);
-
-			GameScreen.boy.bubble.updateTarget(newPos.x,newPos.y);
+//			if(!GameScreen.wormHoleAffected) {
+				GameScreen.boy.normalBoy.setPosition(newPos.x , newPos.y );
+				GameScreen.boy.boundingCircle.setPosition(newPos.x + GameScreen.boy.getOrigin().x, newPos.y + GameScreen.boy.getOrigin().y);
+	
+				GameScreen.boy.bubble.updateTarget(newPos.x,newPos.y);
+//			}
 			
 			delta = last.dst(new Vector2(x, y));
 			last.set(x,y);
@@ -79,51 +84,59 @@ public class OrthoCamController extends InputAdapter {
 	
 		Vector3 newPos = new Vector3(x, y,0);
 		camera.unproject(newPos);
-
+		
 		y = -y + Gdx.graphics.getHeight();
 		
-		normalBoy = GameScreen.boy.normalBoy.getBoundingRectangle();
-		
-		Vector3 pos = new Vector3(normalBoy.x,normalBoy.y,0);
-		
-		camera.project(pos);
-		
-		float w = GameScreen.boy.getSize();
-		
-		float h = GameScreen.boy.getSize();
-		
-		Rectangle box = new Rectangle(pos.x, pos.y, w,h);
-		
-		if(box.contains(x,y) && !GameScreen.boy.isdead) {
-			touched = true;
+		if(Gdx.input.isButtonPressed(Buttons.LEFT) && Gdx.app.getType().equals(ApplicationType.Desktop)) {
 			
-			float centerX = GameScreen.boy.getPosition().x + GameScreen.boy.size / 2;
-			float screenCenterX = box.x + (w / 2);
-			float centerY = GameScreen.boy.getPosition().y - GameScreen.boy.size /2;
-			float screenCenterY = box.y + (h / 2);
+			normalBoy = GameScreen.boy.normalBoy.getBoundingRectangle();
 			
-			if(centerX > newPos.x) {
-				offsetX = -centerX + newPos.x;
-				screenOffsetX = -screenCenterX + x;
-			}
-			else {
-				offsetX = newPos.x - centerX;
-				screenOffsetX = x - screenCenterX;
-			}
-			if(centerY > newPos.y) {
-				offsetY = centerY + newPos.y;
-				screenOffsetY = screenCenterY + y;
-			}
-			else {
-				offsetY = newPos.y - centerY;
-				screenOffsetY = y - screenCenterY;
-			}
+			Vector3 pos = new Vector3(normalBoy.x,normalBoy.y,0);
 			
-			newPos.x -= GameScreen.boy.size / 2;
-			newPos.y += GameScreen.boy.size / 2;
+			camera.project(pos);
 			
-			GameScreen.boy.normalBoy.setPosition(newPos.x -offsetX , newPos.y -offsetY);
-//			last.set(x,y);
+			float w = GameScreen.boy.getSize();
+			
+			float h = GameScreen.boy.getSize();
+			
+			Rectangle box = new Rectangle(pos.x, pos.y, w,h);
+			
+			if(box.contains(x,y) && !GameScreen.boy.isdead) {
+				touched = true;
+				
+				float centerX = GameScreen.boy.getPosition().x + GameScreen.boy.size / 2;
+				float screenCenterX = box.x + (w / 2);
+				float centerY = GameScreen.boy.getPosition().y - GameScreen.boy.size /2;
+				float screenCenterY = box.y + (h / 2);
+				
+				if(centerX > newPos.x) {
+					offsetX = -centerX + newPos.x;
+					screenOffsetX = -screenCenterX + x;
+				}
+				else {
+					offsetX = newPos.x - centerX;
+					screenOffsetX = x - screenCenterX;
+				}
+				if(centerY > newPos.y) {
+					offsetY = centerY + newPos.y;
+					screenOffsetY = screenCenterY + y;
+				}
+				else {
+					offsetY = newPos.y - centerY;
+					screenOffsetY = y - screenCenterY;
+				}
+				
+				newPos.x -= GameScreen.boy.size / 2;
+				newPos.y += GameScreen.boy.size / 2;
+				
+				GameScreen.boy.normalBoy.setPosition(newPos.x -offsetX , newPos.y -offsetY);
+	//			last.set(x,y);
+			
+			}
+		}	else if (Gdx.input.isButtonPressed(Buttons.RIGHT) && Gdx.app.getType().equals(ApplicationType.Desktop)) {
+			camera.project(newPos);
+			GameScreen.worm.position.set(newPos);
+			
 		}
 		
 		return true;
