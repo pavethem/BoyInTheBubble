@@ -6,6 +6,7 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.resolvers.ExternalFileHandleResolver;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.maps.tiled.TideMapLoader.Parameters;
 import com.badlogic.gdx.maps.tiled.TiledMap;
@@ -15,6 +16,7 @@ public class Resources {
 	
 	public static Resources instance;
 	
+	public BitmapFont font;
 	public TextureAtlas boyTextures;
 	public Texture middle;
 //	public Texture boyTex;
@@ -32,6 +34,7 @@ public class Resources {
 	}
 
 	public void reInit() {		
+		font = new BitmapFont();
 		boyTextures = new TextureAtlas(Gdx.files.internal("data/boy.pack"));
 		middle = new Texture(Gdx.files.internal("data/middle.png"));
 //		boyTex = boyTextures.getRegions().get(0).getTexture();

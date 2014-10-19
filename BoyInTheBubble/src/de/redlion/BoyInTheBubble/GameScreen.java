@@ -2,11 +2,13 @@ package de.redlion.BoyInTheBubble;
 
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -24,6 +26,8 @@ public class GameScreen implements ApplicationListener {
 	private OrthographicCamera boyCam;
 	static OrthogonalTiledMapRenderer tiled;
 	private SpriteBatch batch;
+	private SpriteBatch fontBatch;
+	private BitmapFont font;
 	
 	private TiledMapTileLayer layer;
 
@@ -81,6 +85,11 @@ public class GameScreen implements ApplicationListener {
 		camera = new OrthographicCamera(1, h/w);
 		boyCam = new OrthographicCamera(1, h/w);
 		batch = new SpriteBatch();
+		
+		fontBatch = new SpriteBatch();
+		font = Resources.getInstance().font;
+		font.setScale(1);
+		font.setColor(Color.RED);
 		
 		//measurement is 1 tile = 40x40 px
 		tiled = new OrthogonalTiledMapRenderer(Resources.getInstance().map,1/40f);
@@ -141,6 +150,11 @@ public class GameScreen implements ApplicationListener {
 	public void render() {		
 		Gdx.gl.glClearColor(1, 1, 1, 1);
 		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
+
+		//Debugging
+		fontBatch.begin();
+		font.draw(fontBatch, Gdx.graphics.getFramesPerSecond() + " fps", 10, 20);
+		fontBatch.end();
 		
 		delta = Math.min(0.1f, Gdx.graphics.getDeltaTime());	
 //		world.step(delta, 60, 20);
