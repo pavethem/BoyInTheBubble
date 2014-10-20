@@ -62,7 +62,7 @@ public class Bubble2D {
 	//updates the bubble, and looks for potential collisions of grads with walls, obstacles etc
 	//don't update x or y of grad, if it touches anything
 	//this is called per frame and whenever bubble is moved
-	public void updateTarget(float x, float y) {
+	public void updateBubble(float x, float y) {
 		
 		x += GameScreen.boy.getOrigin().x;
 		y += GameScreen.boy.getOrigin().y;

@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Circle;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
@@ -179,7 +180,7 @@ public class Boy {
 		for (int i = 0; i < tailBubbles.size; i++) {
 			Bubble2D b = tailBubbles.get(i);
 			Vector3 pos = positions.get(i);
-			b.updateTarget(-pos.x - size/2, -pos.y - size/2);		
+			b.updateBubble(-pos.x - size/2, -pos.y - size/2);		
 		}
 		
 		//clamp distance between tail positions
@@ -239,7 +240,12 @@ public class Boy {
 			pos3D.lerp(mirror, interpolationFactor);
 			newPos.set(pos3D);
 			newPos.sub(getOrigin().x, getOrigin().y, 0);
-			bubble.updateTarget(newPos.x,newPos.y);
+			
+			//clamp so it doesn't move outside screen
+			newPos.x = MathUtils.clamp(newPos.x,0,29);
+			newPos.y = MathUtils.clamp(newPos.y,0,17);
+			
+			bubble.updateBubble(newPos.x,newPos.y);
 			normalBoy.setPosition(newPos.x, newPos.y);
 			boundingCircle.setPosition(newPos.x,newPos.y);
 		}

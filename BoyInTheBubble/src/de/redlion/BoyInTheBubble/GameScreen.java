@@ -316,7 +316,7 @@ public class GameScreen implements ApplicationListener {
 			//normal boy // tail boy stuff
 			if(!boy.isSplit && splitBoy1.split_dist <= 0) {
 				
-				boy.bubble.updateTarget(boy.getPosition().x,boy.getPosition().y);
+				boy.bubble.updateBubble(boy.getPosition().x,boy.getPosition().y);
 				
 				model.idt();
 				temp.idt();
@@ -446,7 +446,7 @@ public class GameScreen implements ApplicationListener {
 					batch.setTransformMatrix(model);
 					splitBoy1.getCurrentFrame(0).draw(batch);
 					batch.end();
-					splitBoy1.bubble.updateTarget(splitBoy1.getPosition().x,splitBoy1.getPosition().y);
+					splitBoy1.bubble.updateBubble(splitBoy1.getPosition().x,splitBoy1.getPosition().y);
 				}
 				
 				//render splitboy2
@@ -469,10 +469,10 @@ public class GameScreen implements ApplicationListener {
 					batch.setTransformMatrix(model);
 					splitBoy2.getCurrentFrame(0).draw(batch);
 					batch.end();
-					splitBoy2.bubble.updateTarget(splitBoy2.getPosition().x,splitBoy2.getPosition().y);
+					splitBoy2.bubble.updateBubble(splitBoy2.getPosition().x,splitBoy2.getPosition().y);
 				}
 				
-				boy.bubble.updateTarget(boy.getPosition().x,boy.getPosition().y);
+				boy.bubble.updateBubble(boy.getPosition().x,boy.getPosition().y);
 				// render bubbles
 				
 				r.begin(ShapeType.Line);
