@@ -66,8 +66,6 @@ public class GameScreen implements ApplicationListener {
 	
 	public static Wormhole worm;
 	public static Wormhole mirrorWorm;
-	public static boolean wormHoleAffected;
-	
 	public static CollisionDetector collisionDetector;
 	
 //	public static World world;
@@ -142,7 +140,7 @@ public class GameScreen implements ApplicationListener {
 		
 		worm = new Wormhole(new Vector3(-10,-10,-10),true);
 		mirrorWorm = new Wormhole(new Vector3(-10,-10,-10),true);
-		wormHoleAffected = false;
+		boy.iswormHoleAffected = false;
 		
 		Gdx.gl20.glLineWidth(10);
 	}
@@ -696,13 +694,20 @@ public class GameScreen implements ApplicationListener {
 		
 		boyCam.unproject(wurm);
 		
-		if(pos.dst(wurm) <= Constants.MAX_REPEL_DISTANCE) {
-			wormHoleAffected = true;
+		if(pos.dst(wurm) <= Constants.MAX_REPEL_DISTANCE && !boy.hasTail) {
+			boy.iswormHoleAffected = true;
 			Vector3 wormPos = worm.position.cpy();
 			boyCam.unproject(wormPos);
 			boy.manipulateBoy(worm, wormPos);
-		} else
-			wormHoleAffected = false;
+		} else if(pos.dst(wurm) <= Constants.MAX_REPEL_DISTANCE && boy.hasTail) {
+			boy.iswormHoleAffected = true;
+			Vector3 wormPos = worm.position.cpy();
+			boyCam.unproject(wormPos);
+			boy.manipulateTail(worm, wormPos);
+			boy.updateTail(boy.getCorrectedPosition());
+		} else {
+			boy.iswormHoleAffected = false;
+		}
 	}
 
 

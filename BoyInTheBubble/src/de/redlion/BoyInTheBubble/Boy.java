@@ -49,11 +49,14 @@ public class Boy {
 	//Max distace between two tail positions
 	public final float MAX_DISTANCE = 0.7f;
 	public Array<Vector3> positions = new Array<Vector3>(MAX_POSITIONS);
+	//used for wormholes
+	public Vector3 tailDirection = new Vector3(0,0,0);
 	
 	Bubble2D bubble;
 	
 	//bubbles for tail positions
 	public Array<Bubble2D> tailBubbles = new Array<Bubble2D>(MAX_POSITIONS);
+	public boolean iswormHoleAffected;
 	
 	public Boy(float width, float height, boolean createBubble) {
 		
@@ -183,7 +186,11 @@ public class Boy {
 			b.updateBubble(-pos.x - size/2, -pos.y - size/2);		
 		}
 		
-		//clamp distance between tail positions
+		correctTail();
+	}
+	
+	//clamp distance between tail positions
+	public void correctTail() {
 		if(positions.size == MAX_POSITIONS) {
 			for(int i=0;i<MAX_POSITIONS;i++) {
 				if(i+1==MAX_POSITIONS)
@@ -191,11 +198,12 @@ public class Boy {
 				
 				Vector3 current = positions.get(i).cpy();
 				Vector3 next = positions.get(i+1).cpy();
-				
-				if(current.dst(next) >= MAX_DISTANCE) {
-					
-					//a+(b-a)
+				if(current.dst(next) != MAX_DISTANCE) {
+					//a+(b-a));
 					Vector3 direction = next.sub(current);
+					if(iswormHoleAffected)
+						direction.set(tailDirection);
+
 					direction.clamp(0, MAX_DISTANCE);
 					positions.get(i+1).set(current.add(direction));
 				}
@@ -235,7 +243,7 @@ public class Boy {
 		//linear interpolation towards mirror point
 		if(interpolationFactor <= 1.0f) {
 			interpolationFactor+=Constants.REPEL_VELOCITY;
-			Vector3 newPos = new Vector3(bubble.center.x-this.getOrigin().x,bubble.center.y-this.getOrigin().y,0);
+			Vector3 newPos = new Vector3(bubble.center.x,20-bubble.center.y,0);
 			pos3D.y = 20 - pos3D.y;
 			pos3D.lerp(mirror, interpolationFactor);
 			newPos.set(pos3D);
@@ -249,6 +257,26 @@ public class Boy {
 			normalBoy.setPosition(newPos.x, newPos.y);
 			boundingCircle.setPosition(newPos.x,newPos.y);
 		}
+	}
+	
+	//draw or repel tail
+	public void manipulateTail(Wormhole worm, Vector3 pos3D) {
+			
+		Vector3 pos = new Vector3(bubble.center.x,20-bubble.center.y,0);
+		Vector3 wormPos = pos3D.cpy();
+		
+		Vector3 direction = wormPos.sub(pos);
+		direction.scl(1, -1, 1);
+		tailDirection.set(direction);
+		Vector3 end = wormPos.add(direction);
+		end.scl(-1);
+		end.clamp(Constants.MAX_REPEL_DISTANCE - pos.dst(pos3D.cpy()), Constants.MAX_REPEL_DISTANCE - pos.dst(pos3D.cpy()));
+		Vector3 mirror = this.getCorrectedPosition().cpy().scl(-1);
+		mirror.add(end);
+		GameScreen.mirrorWorm.position.set(mirror);
+		
+		correctTail();
+
 	}
 	
 }

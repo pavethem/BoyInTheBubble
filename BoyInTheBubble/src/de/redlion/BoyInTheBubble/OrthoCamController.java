@@ -15,8 +15,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Button;
 public class OrthoCamController extends InputAdapter {
 
 	final OrthographicCamera camera;
-	final Vector3 curr = new Vector3();
 	final Vector2 last = new Vector2();
+	final Vector3 last3D = new Vector3();
 	float delta = 0f;
 	
 	//mouse offset from center of the bubble
@@ -44,31 +44,31 @@ public class OrthoCamController extends InputAdapter {
 			
 		if(touched) {
 			
-			float size =  GameScreen.boy.getSize();
+			if(!GameScreen.boy.iswormHoleAffected || (GameScreen.boy.hasTail && GameScreen.boy.iswormHoleAffected)) {
+				float size =  GameScreen.boy.getSize();
 			
-			//actual position (at the bottom left of the sprite)
-			int correctedX = (int) (x - size/2 - screenOffsetX);
-			int correctedY = (int) (y + size/2 + screenOffsetY);
-
-			correctedX = (int) MathUtils.clamp(correctedX, 0, Gdx.graphics.getWidth() - size);
-			correctedY = (int) MathUtils.clamp(correctedY, size, Gdx.graphics.getHeight());
-			
-			correctedX += (GameScreen.boy.getSize() - GameScreen.boy.getOriginalSize()) / 2;
-			correctedY -= (GameScreen.boy.getSize() - GameScreen.boy.getOriginalSize()) / 2;
-
-			
-			Vector3 newPos = new Vector3(correctedX, correctedY,0);		
-			camera.unproject(newPos);
-			
-//			if(!GameScreen.wormHoleAffected) {
+				//actual position (at the bottom left of the sprite)
+				int correctedX = (int) (x - size/2 - screenOffsetX);
+				int correctedY = (int) (y + size/2 + screenOffsetY);
+	
+				correctedX = (int) MathUtils.clamp(correctedX, 0, Gdx.graphics.getWidth() - size);
+				correctedY = (int) MathUtils.clamp(correctedY, size, Gdx.graphics.getHeight());
+				
+				correctedX += (GameScreen.boy.getSize() - GameScreen.boy.getOriginalSize()) / 2;
+				correctedY -= (GameScreen.boy.getSize() - GameScreen.boy.getOriginalSize()) / 2;
+	
+				
+				Vector3 newPos = new Vector3(correctedX, correctedY,0);		
+				camera.unproject(newPos);
 				GameScreen.boy.normalBoy.setPosition(newPos.x , newPos.y );
 				GameScreen.boy.boundingCircle.setPosition(newPos.x + GameScreen.boy.getOrigin().x, newPos.y + GameScreen.boy.getOrigin().y);
-	
 				GameScreen.boy.bubble.updateBubble(newPos.x,newPos.y);
-//			}
+			}
 			
 			delta = last.dst(new Vector2(x, y));
 			last.set(x,y);
+			last3D.set(x,y,0);
+			camera.unproject(last3D);
 		}
 		return true;
 	}
@@ -130,8 +130,10 @@ public class OrthoCamController extends InputAdapter {
 				newPos.y += GameScreen.boy.size / 2;
 				
 				GameScreen.boy.normalBoy.setPosition(newPos.x -offsetX , newPos.y -offsetY);
-	//			last.set(x,y);
-			
+				last.set(x,y);
+				last3D.set(x,y,0);
+				camera.unproject(last3D);
+				
 			}
 		}	else if (Gdx.input.isButtonPressed(Buttons.RIGHT) && Gdx.app.getType().equals(ApplicationType.Desktop)) {
 			camera.project(newPos);
