@@ -36,7 +36,7 @@ public class Boy {
 	public float smallSize = 1.5f;
 	public float bigSize = 5f;
 	
-	public float repelFactor = 1.0f;
+	public float interpolationFactor = 1.0f;
 	
 	public final float SPLIT_DISTANCE = 1.9f;
 //	public final float MAX_GROWTH_MOD = 1.03f;
@@ -220,20 +220,28 @@ public class Boy {
 		Vector3 mirror = this.getCorrectedPosition().cpy().scl(-1);
 		mirror.add(end);
 		GameScreen.mirrorWorm.position.set(mirror);
-		
-		repelFactor+=0.01f;
-		if(repelFactor <= 1.0f) {
-		
+
+		//reverse linear interpolation to get alpha
+		Vector3 position = new Vector3(bubble.center.x,bubble.center.y,0);
+		Vector3 wurm = pos3D.cpy();
+		wurm.y = 20-wurm.y;
+		Vector3 spiegel = mirror.cpy();
+
+		float t  = (position.sub(spiegel).len()) / (wurm.sub(spiegel).len());
+
+		interpolationFactor = 1-t;
+
+		//linear interpolation towards mirror point
+		if(interpolationFactor <= 1.0f) {
+			interpolationFactor+=Constants.REPEL_VELOCITY;
 			Vector3 newPos = new Vector3(bubble.center.x-this.getOrigin().x,bubble.center.y-this.getOrigin().y,0);
 			pos3D.y = 20 - pos3D.y;
-			pos3D.lerp(mirror, repelFactor);
+			pos3D.lerp(mirror, interpolationFactor);
 			newPos.set(pos3D);
 			newPos.sub(getOrigin().x, getOrigin().y, 0);
 			bubble.updateTarget(newPos.x,newPos.y);
-//			normalBoy.setPosition(newPos.x, newPos.y);
-//			boundingCircle.setPosition(newPos.x,newPos.y);
-		}else {
-			repelFactor =1.0f;
+			normalBoy.setPosition(newPos.x, newPos.y);
+			boundingCircle.setPosition(newPos.x,newPos.y);
 		}
 	}
 	

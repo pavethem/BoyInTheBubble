@@ -5,4 +5,5 @@ public class Constants {
 	final public static float PIXELS_PER_METER = 20;
 	//used for repelling boy by wormhole
 	final public static float MAX_REPEL_DISTANCE = 10.0f;
+	final public static float REPEL_VELOCITY = 0.005f;
 }
